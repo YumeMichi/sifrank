@@ -1,3 +1,13 @@
+//
+// Copyright 2021 YumeMichi. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style license
+// that can be found in the LICENSE file in the root of the source
+// tree.
+
+// This binary provides sample code for using the gopacket TCP assembler and TCP
+// stream reader.  It reads packets off the wire and reconstructs HTTP requests
+// it sees, logging them.
 package bot
 
 import (
@@ -5,10 +15,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 	"io/ioutil"
-	"log"
+	"math"
 	"net/http"
 	"net/url"
 	"strings"
@@ -51,14 +62,14 @@ func init() {
 		Handle(func(ctx *zero.Ctx) {
 			result, err := getData()
 			if err != nil {
-				log.Println(err)
+				logrus.Warn(err)
 				return
 			}
 			if len(result) != 3 {
 				ctx.Send("【档线小助手】数据获取失败，请联系维护人员~")
 				return
 			}
-			msg := fmt.Sprintf("档线小助手\n一档线: %d\n二档线: %d\n三档线: %d", result["ranking_1"], result["ranking_2"], result["ranking_3"])
+			msg := fmt.Sprintf("【LoveLive! 国服档线小助手】\n当前活动: AZALEA 的前进之路!\n剩余时间: %s\n一档线积分: %d\n二档线积分: %d\n三档线积分: %d", getETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
 			ctx.Send(message.Text(msg))
 		})
 }
@@ -72,29 +83,29 @@ func getData() (map[string]int, error) {
 	})
 	result, err := rdb.HGetAll(ctx, "request_header").Result()
 	if err != nil {
-		log.Println("No request header: ", err.Error())
+		logrus.Warn("No request header: ", err.Error())
 		return map[string]int{}, err
 	}
 	for k, v := range result {
 		requestData, err := rdb.HGet(ctx, "request_data", k).Result()
 		if err == redis.Nil {
-			log.Println("No request data for", k)
+			logrus.Warn("No request data for", k)
 			continue
 		} else if err != nil {
-			log.Println("No request data: ", err.Error())
+			logrus.Warn("No request data: ", err.Error())
 			continue
 		}
 		form := url.Values{"request_data": {requestData}}
 		requestUrl := "http://prod.game1.ll.sdo.com/main.php/ranking/eventPlayer"
 		req, err := http.NewRequest("POST", requestUrl, strings.NewReader(form.Encode()))
 		if err != nil {
-			log.Println("Send request error: ", err.Error())
+			logrus.Warn("Send request error: ", err.Error())
 			continue
 		}
 		headers := make(map[string]string)
 		err = json.Unmarshal([]byte(v), &headers)
 		if err != nil {
-			log.Println("Unmarshal failed: ", err.Error())
+			logrus.Warn("Unmarshal failed: ", err.Error())
 			continue
 		}
 		for kk, vv := range headers {
@@ -104,14 +115,14 @@ func getData() (map[string]int, error) {
 		client := http.Client{Timeout: 5 * time.Second}
 		resp, err := client.Do(req)
 		if err != nil {
-			log.Println("Send request failed: ", err.Error())
+			logrus.Warn("Send request failed: ", err.Error())
 			continue
 		}
 		body, _ := ioutil.ReadAll(resp.Body)
 
 		var res = &Response{}
 		if err := json.Unmarshal(body, res); err != nil {
-			log.Println("Unmarshal failed: ", err.Error())
+			logrus.Warn("Unmarshal failed: ", err.Error())
 			continue
 		}
 		items := res.ResponseData.Items
@@ -120,7 +131,21 @@ func getData() (map[string]int, error) {
 		ret[k] = result.Score
 
 		_ = resp.Body.Close()
+
+		time.Sleep(time.Millisecond * 500)
 	}
 	return ret, nil
+}
+
+func getETA() string {
+	now := time.Now().Local()
+	end, _ := time.Parse("2006-01-02 15:04:05", "2021-03-08 14:00:00")
+	hours := math.Floor(end.Sub(now).Hours())
+	minutes := math.Floor(end.Sub(now).Minutes() - hours*60)
+	if hours > 0 {
+		return fmt.Sprintf("%d 小时 %d 分钟", int(hours), int(minutes))
+	} else {
+		return fmt.Sprintf("%d 分钟", int(minutes))
+	}
 }
 

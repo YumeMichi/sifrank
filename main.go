@@ -1,4 +1,6 @@
+//
 // Copyright 2012 Google, Inc. All rights reserved.
+// Copyright 2021 YumeMichi. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style license
 // that can be found in the LICENSE file in the root of the source
@@ -26,7 +28,6 @@ import (
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/driver"
 	"io"
-	"log"
 	"net/http"
 	_ "sifrank/bot"
 	"strings"
@@ -74,8 +75,8 @@ func (h *httpStream) run() {
 			// We must read until we see an EOF... very important!
 			return
 		} else if err != nil {
+			//logrus.Warn("Error reading stream", h.net, h.transport, ":", err)
 			continue
-			// log.Println("Error reading stream", h.net, h.transport, ":", err)
 		} else {
 			if req == nil {
 				continue
@@ -100,10 +101,10 @@ func (h *httpStream) run() {
 			}
 			m, err := json.Marshal(headers)
 			if err != nil {
-				log.Println("Failed to marshal headers into json: ", err.Error())
+				logrus.Warn("Failed to marshal headers into json: ", err.Error())
 				continue
 			}
-			log.Println(string(m))
+			logrus.Info(string(m))
 			if ranking == "" {
 				continue
 			}
@@ -112,10 +113,10 @@ func (h *httpStream) run() {
 			}
 			err = rdb.HSet(ctx, "request_header", requestHeader).Err()
 			if err != nil {
-				log.Println("Failed to save json to Redis: ", err.Error())
+				logrus.Warn("Failed to save json to Redis: ", err.Error())
 				continue
 			}
-			log.Println("Success!")
+			logrus.Info("Success!")
 		}
 	}
 }
@@ -123,7 +124,7 @@ func (h *httpStream) run() {
 func init() {
 	logrus.SetFormatter(&easy.Formatter{
 		TimestampFormat: "2006-01-02 15:04:05",
-		LogFormat:       "[YumeMichi][%time%][%lvl%]: %msg% \n",
+		LogFormat:       "[%time%][%lvl%]: %msg% \n",
 	})
 	logrus.SetLevel(logrus.DebugLevel)
 }
@@ -135,18 +136,20 @@ func main() {
 
 	// Set up pcap packet capture
 	if *fname != "" {
-		log.Printf("Reading from pcap dump %q", *fname)
+		logrus.Infof("Reading from pcap dump %q", *fname)
 		handle, err = pcap.OpenOffline(*fname)
 	} else {
-		log.Printf("Starting capture on interface %q", *iface)
+		logrus.Infof("Starting capture on interface %q", *iface)
 		handle, err = pcap.OpenLive(*iface, int32(*snaplen), true, pcap.BlockForever)
 	}
 	if err != nil {
-		log.Fatal(err)
+		logrus.Error(err)
+		return
 	}
 
 	if err := handle.SetBPFFilter(*filter); err != nil {
-		log.Fatal(err)
+		logrus.Error(err)
+		return
 	}
 
 	// Set up assembly
@@ -171,7 +174,7 @@ func main() {
 		},
 	})
 
-	log.Println("Reading in packets")
+	logrus.Info("Reading in packets")
 	// Read in packets, pass to assembler.
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	packets := packetSource.Packets()
@@ -184,7 +187,7 @@ func main() {
 				return
 			}
 			if packet.NetworkLayer() == nil || packet.TransportLayer() == nil || packet.TransportLayer().LayerType() != layers.LayerTypeTCP {
-				log.Println("Unusable packet")
+				logrus.Info("Unusable packet")
 				continue
 			}
 			tcp := packet.TransportLayer().(*layers.TCP)
@@ -194,7 +197,6 @@ func main() {
 				if !strings.Contains(v, "eventPlayer") || strings.Contains(v, "HTTP") {
 					continue
 				}
-				log.Println(v)
 				if strings.Contains(v, "\"rank\":\"120\"") {
 					ranking = "ranking_1"
 				} else if strings.Contains(v, "\"rank\":\"700\"") {
@@ -212,7 +214,7 @@ func main() {
 				}
 				err = rdb.HSet(ctx, "request_data", requestData).Err()
 				if err != nil {
-					log.Println("Failed to save json to Redis: ", err.Error())
+					logrus.Warn("Failed to save json to Redis: ", err.Error())
 					continue
 				}
 			}
