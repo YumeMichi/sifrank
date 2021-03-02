@@ -13,6 +13,7 @@ package bot
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
@@ -49,11 +50,6 @@ type ItemData struct {
 	SettingAwardId int         `json:"setting_award_id"`
 }
 
-type ErrorData struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
 var ctx = context.Background()
 
 func init() {
@@ -61,12 +57,9 @@ func init() {
 	zero.OnMessage(rule).SetBlock(true).SetPriority(10).
 		Handle(func(ctx *zero.Ctx) {
 			result, err := getData()
-			if err != nil {
-				logrus.Warn(err)
-				return
-			}
-			if len(result) != 3 {
-				ctx.Send("【档线小助手】数据获取失败，请联系维护人员~")
+			if err != nil || len(result) != 3 {
+				logrus.Warn(err.Error())
+				ctx.Send("【LoveLive! 国服档线小助手】\n数据获取失败，请联系维护人员~")
 				return
 			}
 			msg := fmt.Sprintf("【LoveLive! 国服档线小助手】\n当前活动: AZALEA 的前进之路!\n剩余时间: %s\n一档线积分: %d\n二档线积分: %d\n三档线积分: %d", getETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
@@ -127,12 +120,16 @@ func getData() (map[string]int, error) {
 		}
 		items := res.ResponseData.Items
 		itemLen := len(items)
+		if itemLen == 0 {
+			_ = resp.Body.Close()
+			return map[string]int{}, errors.New(string(body))
+		}
 		result := items[itemLen-1]
 		ret[k] = result.Score
 
 		_ = resp.Body.Close()
 
-		time.Sleep(time.Millisecond * 500)
+		time.Sleep(time.Millisecond * 300)
 	}
 	return ret, nil
 }
