@@ -58,7 +58,7 @@ func init() {
 		Handle(func(ctx *zero.Ctx) {
 			result, err := getData()
 			if err != nil || len(result) != 3 {
-				logrus.Warn(err.Error())
+				logrus.Warn(err)
 				ctx.Send("【LoveLive! 国服档线小助手】\n数据获取失败，请联系维护人员~")
 				return
 			}
