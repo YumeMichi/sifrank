@@ -94,6 +94,7 @@ func (h *httpStream) run() {
 			req.Header.Del("Accept-Encoding")
 			req.Header.Del("Accept")
 			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			req.Header.Set("User-Agent", "Mozilla/5.0 (Linux; Android 11; ONE E1001 Build/RQ1A.210105.003) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/87.0.4280.101 Mobile Safari/537.36")
 			// Save headers to Redis
 			headers := make(map[string]string)
 			for k, v := range req.Header {
