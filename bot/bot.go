@@ -23,6 +23,8 @@ import (
 	"math"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -59,7 +61,8 @@ func init() {
 			result, err := getData()
 			if err != nil || len(result) != 3 {
 				logrus.Warn(err)
-				ctx.Send("【LoveLive! 国服档线小助手】\n数据获取失败，请联系维护人员~")
+				dir, _ := os.Getwd()
+				ctx.Send("【LoveLive! 国服档线小助手】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///"+filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg"))+"][CQ:at,qq=1157490807]")
 				return
 			}
 			msg := fmt.Sprintf("【LoveLive! 国服档线小助手】\n当前活动: AZALEA 的前进之路!\n剩余时间: %s\n一档线积分: %d\n二档线积分: %d\n三档线积分: %d", getETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
