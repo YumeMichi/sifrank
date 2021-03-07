@@ -25,6 +25,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -52,21 +53,95 @@ type ItemData struct {
 	SettingAwardId int         `json:"setting_award_id"`
 }
 
+type CardInfo struct {
+	App         string `json:"app"`
+	Desc        string `json:"desc"`
+	View        string `json:"view"`
+	Ver         string `json:"ver"`
+	Prompt      string `json:"prompt"`
+	AppID       string `json:"appID"`
+	SourceName  string `json:"sourceName"`
+	ActionData  string `json:"actionData"`
+	ActionDataA string `json:"actionData_A"`
+	SourceUrl   string `json:"sourceUrl"`
+	Meta        struct {
+		Notification struct {
+			AppInfo struct {
+				AppName string `json:"appName"`
+				AppType int    `json:"appType"`
+				AppId   int    `json:"appid"`
+				IconUrl string `json:"iconUrl"`
+			} `json:"appInfo"`
+			Data [4]struct {
+				Title string `json:"title"`
+				Value string `json:"value"`
+			} `json:"data"`
+			Title  string `json:"title"`
+			Button [0]struct {
+				Name   string `json:"name"`
+				Action string `json:"action"`
+			} `json:"button"`
+			EmphasisKeyword string `json:"emphasis_keyword"`
+		} `json:"notification"`
+	} `json:"meta"`
+	Text     string `json:"text"`
+	SourceAd string `json:"sourceAd"`
+}
+
 var ctx = context.Background()
 
 func init() {
-	rule := zero.SuffixRule("档线")
-	zero.OnMessage(rule).SetBlock(true).SetPriority(10).
+	rankRule := zero.FullMatchRule("档线")
+	zero.OnMessage(rankRule).SetBlock(true).SetPriority(10).
 		Handle(func(ctx *zero.Ctx) {
 			result, err := getData()
 			if err != nil || len(result) != 3 {
 				logrus.Warn(err)
 				dir, _ := os.Getwd()
-				ctx.Send("【LoveLive! 国服档线小助手】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///"+filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg"))+"][CQ:at,qq=1157490807]")
+				ctx.Send("【LoveLive! 国服档线小助手】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=1157490807]")
 				return
 			}
 			msg := fmt.Sprintf("【LoveLive! 国服档线小助手】\n当前活动: AZALEA 的前进之路!\n剩余时间: %s\n一档线积分: %d\n二档线积分: %d\n三档线积分: %d", getETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
 			ctx.Send(message.Text(msg))
+		})
+
+	cardRule := zero.FullMatchRule("查询档线")
+	zero.OnMessage(cardRule).SetBlock(true).SetPriority(1).
+		Handle(func(ctx *zero.Ctx) {
+			result, err := getData()
+			if err != nil || len(result) != 3 {
+				logrus.Warn(err)
+				dir, _ := os.Getwd()
+				ctx.Send("【LoveLive! 国服档线小助手】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=1157490807]")
+				return
+			}
+			var card = &CardInfo{}
+			card.App = "com.tencent.miniapp"
+			card.View = "notification"
+			card.Ver = "0.0.0.1"
+			card.Prompt = "[应用]"
+			card.Meta.Notification.AppInfo.AppName = "LoveLive! 国服档线小助手"
+			card.Meta.Notification.AppInfo.AppType = 4
+			card.Meta.Notification.AppInfo.AppId = 1109659848
+			card.Meta.Notification.AppInfo.IconUrl = "https://c-ssl.duitang.com/uploads/item/201906/07/20190607235250_wtjcy.thumb.1000_0.jpg"
+			card.Meta.Notification.Data[0].Title = "结束时间"
+			card.Meta.Notification.Data[0].Value = getETA()
+			card.Meta.Notification.Data[1].Title = "一档线"
+			card.Meta.Notification.Data[1].Value = strconv.Itoa(result["ranking_1"])
+			card.Meta.Notification.Data[2].Title = "二档线"
+			card.Meta.Notification.Data[2].Value = strconv.Itoa(result["ranking_2"])
+			card.Meta.Notification.Data[3].Title = "三档线"
+			card.Meta.Notification.Data[3].Value = strconv.Itoa(result["ranking_3"])
+			card.Meta.Notification.Title = "AZALEA 的前进之路!"
+			msg, err := json.Marshal(card)
+			if err != nil {
+				logrus.Warn("Marshal failed: ", err.Error())
+				return
+			}
+			content := strings.ReplaceAll(string(msg), ",", "&#44;")
+			content = strings.ReplaceAll(content, "[", "&#91;")
+			content = strings.ReplaceAll(content, "]", "&#93;")
+			ctx.Send("[CQ:json,data=" + content + "]")
 		})
 }
 
