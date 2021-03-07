@@ -94,21 +94,21 @@ func init() {
 	rankRule := zero.FullMatchRule("档线")
 	zero.OnMessage(rankRule).SetBlock(true).SetPriority(10).
 		Handle(func(ctx *zero.Ctx) {
-			result, err := getData()
+			result, err := GetData()
 			if err != nil || len(result) != 3 {
 				logrus.Warn(err)
 				dir, _ := os.Getwd()
 				ctx.Send("【LoveLive! 国服档线小助手】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=1157490807]")
 				return
 			}
-			msg := fmt.Sprintf("【LoveLive! 国服档线小助手】\n当前活动: AZALEA 的前进之路!\n剩余时间: %s\n一档线积分: %d\n二档线积分: %d\n三档线积分: %d", getETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
+			msg := fmt.Sprintf("【LoveLive! 国服档线小助手】\n当前活动: AZALEA 的前进之路!\n剩余时间: %s\n一档线积分: %d\n二档线积分: %d\n三档线积分: %d", GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
 			ctx.Send(message.Text(msg))
 		})
 
 	cardRule := zero.FullMatchRule("查询档线")
 	zero.OnMessage(cardRule).SetBlock(true).SetPriority(1).
 		Handle(func(ctx *zero.Ctx) {
-			result, err := getData()
+			result, err := GetData()
 			if err != nil || len(result) != 3 {
 				logrus.Warn(err)
 				dir, _ := os.Getwd()
@@ -125,7 +125,7 @@ func init() {
 			card.Meta.Notification.AppInfo.AppId = 1109659848
 			card.Meta.Notification.AppInfo.IconUrl = "https://c-ssl.duitang.com/uploads/item/201906/07/20190607235250_wtjcy.thumb.1000_0.jpg"
 			card.Meta.Notification.Data[0].Title = "结束时间"
-			card.Meta.Notification.Data[0].Value = getETA()
+			card.Meta.Notification.Data[0].Value = GetETA()
 			card.Meta.Notification.Data[1].Title = "一档线"
 			card.Meta.Notification.Data[1].Value = strconv.Itoa(result["ranking_1"])
 			card.Meta.Notification.Data[2].Title = "二档线"
@@ -145,7 +145,7 @@ func init() {
 		})
 }
 
-func getData() (map[string]int, error) {
+func GetData() (map[string]int, error) {
 	ret := make(map[string]int)
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     "127.0.0.1:6379",
@@ -212,7 +212,7 @@ func getData() (map[string]int, error) {
 	return ret, nil
 }
 
-func getETA() string {
+func GetETA() string {
 	now := time.Now().Local()
 	end, _ := time.ParseInLocation("2006-01-02 15:04:05", "2021-03-08 14:00:00", time.Local)
 	hours := math.Floor(end.Sub(now).Hours())

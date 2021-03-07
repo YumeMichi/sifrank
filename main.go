@@ -16,6 +16,7 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"github.com/go-redis/redis/v8"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/examples/util"
@@ -28,8 +29,10 @@ import (
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/driver"
 	"io"
+	"io/ioutil"
 	"net/http"
-	_ "sifrank/bot"
+	"net/url"
+	"sifrank/bot"
 	"strings"
 	"time"
 )
@@ -180,6 +183,7 @@ func main() {
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	packets := packetSource.Packets()
 	ticker := time.Tick(time.Minute)
+	ticker2 := time.Tick(time.Hour)
 	for {
 		select {
 		case packet := <-packets:
@@ -223,6 +227,26 @@ func main() {
 		case <-ticker:
 			// Every minute, flush connections that haven't seen activity in the past 2 minutes.
 			assembler.FlushOlderThan(time.Now().Add(time.Minute * -2))
+		case <-ticker2:
+			result, err := bot.GetData()
+			if err != nil || len(result) != 3 {
+				logrus.Warn(err)
+				return
+			}
+			groups := []string{"794573579", "728481207"}
+			//groups := []string{"74735535"}
+			msg := fmt.Sprintf("【LoveLive! 国服档线定时提醒小助手】\n当前活动: AZALEA 的前进之路!\n剩余时间: %s\n一档线积分: %d\n二档线积分: %d\n三档线积分: %d", bot.GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
+			client := http.Client{Timeout: time.Second * 5}
+			for _, v := range groups {
+				req, err := http.NewRequest("GET", "http://127.0.0.1:5700/send_group_msg?group_id="+v+"&message="+url.QueryEscape(msg), nil)
+				if err != nil {
+					logrus.Warn("Send group message failed: ", err.Error())
+					return
+				}
+				resp, _ := client.Do(req)
+				body, _ := ioutil.ReadAll(resp.Body)
+				logrus.Info(string(body))
+			}
 		}
 	}
 }
