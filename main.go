@@ -126,6 +126,15 @@ func (h *httpStream) run() {
 }
 
 func init() {
+	zero.Run(zero.Config{
+		NickName:      []string{"YumeMichi"},
+		CommandPrefix: "/",
+		SuperUsers:    []string{"785569962", "1157490807"},
+		Driver: []zero.Driver{
+			driver.NewWebSocketClient("127.0.0.1", "6700", ""),
+		},
+	})
+
 	logrus.SetFormatter(&easy.Formatter{
 		TimestampFormat: "2006-01-02 15:04:05",
 		LogFormat:       "[%time%][%lvl%]: %msg% \n",
@@ -168,18 +177,8 @@ func main() {
 		DB:       0,
 	})
 
-	// Init bot
-	zero.Run(zero.Config{
-		NickName:      []string{"YumeMichi"},
-		CommandPrefix: "/",
-		SuperUsers:    []string{"785569962", "1157490807"},
-		Driver: []zero.Driver{
-			driver.NewWebSocketClient("127.0.0.1", "6700", ""),
-		},
-	})
-
-	logrus.Info("Reading in packets")
 	// Read in packets, pass to assembler.
+	logrus.Info("Reading in packets")
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	packets := packetSource.Packets()
 	ticker := time.Tick(time.Minute)
