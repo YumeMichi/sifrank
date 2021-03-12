@@ -215,6 +215,9 @@ func GetData() (map[string]int, error) {
 func GetETA() string {
 	now := time.Now().Local()
 	end, _ := time.ParseInLocation("2006-01-02 15:04:05", "2021-03-08 14:00:00", time.Local)
+	if now.After(end) {
+		return "已结束"
+	}
 	hours := math.Floor(end.Sub(now).Hours())
 	minutes := math.Floor(end.Sub(now).Minutes() - hours*60)
 	if hours > 0 {
