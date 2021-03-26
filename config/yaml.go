@@ -16,6 +16,7 @@ type YamlConfigs struct {
 	Filter        string   `yaml:"filter"`
 	NickName      []string `yaml:"nickname"`
 	SuperUsers    []string `yaml:"super_users"`
+	AdminUser     string   `yaml:"admin_user"`
 	CqhttpHost    string   `yaml:"cqhttp_host"`
 	CqhttpPort    string   `yaml:"cqhttp_port"`
 	AccessToken   string   `yaml:"access_token"`
@@ -24,6 +25,10 @@ type YamlConfigs struct {
 	RedisPassword string   `yaml:"redis_password"`
 	RedisDb       int      `yaml:"redis_db"`
 	Groups        []string `yaml:"groups"`
+	AppName       string   `yaml:"app_name"`
+	EventName     string   `yaml:"event_name"`
+	EndTime       string   `yaml:"end_time"`
+	IconUrl       string   `yaml:"icon_url"`
 }
 
 func DefaultConfigs() *YamlConfigs {
@@ -34,6 +39,7 @@ func DefaultConfigs() *YamlConfigs {
 		Filter:        "tcp and port 80",
 		NickName:      []string{"YumeMichi"},
 		SuperUsers:    []string{"785569962", "1157490807"},
+		AdminUser:     "1157490807",
 		CqhttpHost:    "127.0.0.1",
 		CqhttpPort:    "6700",
 		AccessToken:   "",
@@ -42,6 +48,10 @@ func DefaultConfigs() *YamlConfigs {
 		RedisPassword: "",
 		RedisDb:       0,
 		Groups:        []string{},
+		AppName:       "LoveLive! 国服档线小助手",
+		EventName:     "",
+		EndTime:       "",
+		IconUrl:       "https://c-ssl.duitang.com/uploads/item/201906/07/20190607235250_wtjcy.thumb.1000_0.jpg",
 	}
 }
 

@@ -98,10 +98,10 @@ func init() {
 			if err != nil || len(result) != 3 {
 				logrus.Warn(err)
 				dir, _ := os.Getwd()
-				ctx.Send("【LoveLive! 国服档线小助手】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=1157490807]")
+				ctx.Send("【" + config.Conf.AppName + "】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=" + config.Conf.AdminUser + "]")
 				return
 			}
-			msg := fmt.Sprintf("【LoveLive! 国服档线小助手】\n当前活动: Guilty Kiss 的作风!\n剩余时间: %s\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s", GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
+			msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: %s\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s", config.Conf.AppName, config.Conf.EventName, GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
 			ctx.Send(message.Text(msg))
 		})
 
@@ -112,7 +112,7 @@ func init() {
 			if err != nil || len(result) != 3 {
 				logrus.Warn(err)
 				dir, _ := os.Getwd()
-				ctx.Send("【LoveLive! 国服档线小助手】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=1157490807]")
+				ctx.Send("【" + config.Conf.AppName + "】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=" + config.Conf.AdminUser + "]")
 				return
 			}
 			var card = &CardInfo{}
@@ -120,10 +120,10 @@ func init() {
 			card.View = "notification"
 			card.Ver = "0.0.0.1"
 			card.Prompt = "[应用]"
-			card.Meta.Notification.AppInfo.AppName = "LoveLive! 国服档线小助手"
+			card.Meta.Notification.AppInfo.AppName = config.Conf.AppName
 			card.Meta.Notification.AppInfo.AppType = 4
 			card.Meta.Notification.AppInfo.AppId = 1109659848
-			card.Meta.Notification.AppInfo.IconUrl = "https://c-ssl.duitang.com/uploads/item/201906/07/20190607235250_wtjcy.thumb.1000_0.jpg"
+			card.Meta.Notification.AppInfo.IconUrl = config.Conf.IconUrl
 			card.Meta.Notification.Data[0].Title = "结束时间"
 			card.Meta.Notification.Data[0].Value = GetETA()
 			card.Meta.Notification.Data[1].Title = "一档线点数"
@@ -132,7 +132,7 @@ func init() {
 			card.Meta.Notification.Data[2].Value = result["ranking_2"]
 			card.Meta.Notification.Data[3].Title = "三档线点数"
 			card.Meta.Notification.Data[3].Value = result["ranking_3"]
-			card.Meta.Notification.Title = "Guilty Kiss 的作风!"
+			card.Meta.Notification.Title = config.Conf.EventName
 			msg, err := json.Marshal(card)
 			if err != nil {
 				logrus.Warn("Marshal failed: ", err.Error())
@@ -215,7 +215,7 @@ func GetData() (map[string]string, error) {
 
 func GetETA() string {
 	now := time.Now().Local()
-	end, _ := time.ParseInLocation("2006-01-02 15:04:05", "2021-04-06 14:00:00", time.Local)
+	end, _ := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.EndTime, time.Local)
 	if now.After(end) {
 		return "已结束"
 	}
