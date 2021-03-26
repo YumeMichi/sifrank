@@ -24,6 +24,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sifrank/config"
 	"strconv"
 	"strings"
 	"time"
@@ -147,9 +148,9 @@ func init() {
 func GetData() (map[string]string, error) {
 	ret := make(map[string]string)
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "127.0.0.1:6379",
-		Password: "",
-		DB:       0,
+		Addr:     fmt.Sprintf("%s:%s", config.Conf.RedisHost, config.Conf.RedisPort),
+		Password: config.Conf.RedisPassword,
+		DB:       config.Conf.RedisDb,
 	})
 	result, err := rdb.HGetAll(ctx, "request_header").Result()
 	if err != nil {

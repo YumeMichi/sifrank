@@ -11,4 +11,5 @@ require (
 	github.com/tidwall/pretty v1.1.0 // indirect
 	github.com/wdvxdr1123/ZeroBot v1.0.1 // indirect
 	golang.org/x/sys v0.0.0-20210305230114-8fe3ee5dd75b // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )

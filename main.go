@@ -15,7 +15,6 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"github.com/google/gopacket"
@@ -33,14 +32,10 @@ import (
 	"net/http"
 	"net/url"
 	"sifrank/bot"
+	"sifrank/config"
 	"strings"
 	"time"
 )
-
-var iface = flag.String("i", "enp8s0", "Interface to get packets from")
-var fname = flag.String("r", "", "Filename to read from, overrides -i")
-var snaplen = flag.Int("s", 1600, "SnapLen for pcap packet capture")
-var filter = flag.String("f", "tcp and port 80", "BPF filter for pcap")
 
 var ctx = context.Background()
 var ranking = ""
@@ -127,11 +122,11 @@ func (h *httpStream) run() {
 
 func init() {
 	zero.Run(zero.Config{
-		NickName:      []string{"YumeMichi"},
+		NickName:      config.Conf.NickName,
 		CommandPrefix: "/",
-		SuperUsers:    []string{"785569962", "1157490807"},
+		SuperUsers:    config.Conf.SuperUsers,
 		Driver: []zero.Driver{
-			driver.NewWebSocketClient("127.0.0.1", "6700", ""),
+			driver.NewWebSocketClient(config.Conf.CqhttpHost, config.Conf.CqhttpPort, config.Conf.AccessToken),
 		},
 	})
 
@@ -140,6 +135,13 @@ func init() {
 		LogFormat:       "[%time%][%lvl%]: %msg% \n",
 	})
 	logrus.SetLevel(logrus.DebugLevel)
+
+	// Connect to Redis
+	rdb = redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%s", config.Conf.RedisHost, config.Conf.RedisPort),
+		Password: config.Conf.RedisPassword,
+		DB:       config.Conf.RedisDb,
+	})
 }
 
 func main() {
@@ -148,19 +150,19 @@ func main() {
 	var err error
 
 	// Set up pcap packet capture
-	if *fname != "" {
-		logrus.Infof("Reading from pcap dump %q", *fname)
-		handle, err = pcap.OpenOffline(*fname)
+	if config.Conf.Fname != "" {
+		logrus.Infof("Reading from pcap dump %s", config.Conf.Fname)
+		handle, err = pcap.OpenOffline(config.Conf.Fname)
 	} else {
-		logrus.Infof("Starting capture on interface %q", *iface)
-		handle, err = pcap.OpenLive(*iface, int32(*snaplen), true, pcap.BlockForever)
+		logrus.Infof("Starting capture on interface %s", config.Conf.Iface)
+		handle, err = pcap.OpenLive(config.Conf.Iface, int32(config.Conf.Snaplen), true, pcap.BlockForever)
 	}
 	if err != nil {
 		logrus.Error(err)
 		return
 	}
 
-	if err := handle.SetBPFFilter(*filter); err != nil {
+	if err := handle.SetBPFFilter(config.Conf.Filter); err != nil {
 		logrus.Error(err)
 		return
 	}
@@ -169,13 +171,6 @@ func main() {
 	streamFactory := &httpStreamFactory{}
 	streamPool := tcpassembly.NewStreamPool(streamFactory)
 	assembler := tcpassembly.NewAssembler(streamPool)
-
-	// Connect to Redis
-	rdb = redis.NewClient(&redis.Options{
-		Addr:     "127.0.0.1:6379",
-		Password: "",
-		DB:       0,
-	})
 
 	// Read in packets, pass to assembler.
 	logrus.Info("Reading in packets")
@@ -232,7 +227,7 @@ func main() {
 				logrus.Warn(err)
 				return
 			}
-			groups := []string{"794573579", "728481207"}
+			groups := config.Conf.Groups
 			//groups := []string{"74735535"}
 			msg := fmt.Sprintf("【LoveLive! 国服档线提醒小助手】\n当前活动: Guilty Kiss 的作风!\n剩余时间: %s\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s", bot.GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
 			client := http.Client{Timeout: time.Second * 5}
