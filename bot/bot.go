@@ -101,7 +101,7 @@ func init() {
 				ctx.Send("【LoveLive! 国服档线小助手】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=1157490807]")
 				return
 			}
-			msg := fmt.Sprintf("【LoveLive! 国服档线小助手】\n当前活动: 凛的可爱探索大作战\n剩余时间: %s\n一档线点数: %d\n二档线点数: %d\n三档线点数: %d", GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
+			msg := fmt.Sprintf("【LoveLive! 国服档线小助手】\n当前活动: Guilty Kiss 的作风!\n剩余时间: %s\n一档线点数: %d\n二档线点数: %d\n三档线点数: %d", GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
 			ctx.Send(message.Text(msg))
 		})
 
@@ -132,7 +132,7 @@ func init() {
 			card.Meta.Notification.Data[2].Value = strconv.Itoa(result["ranking_2"])
 			card.Meta.Notification.Data[3].Title = "三档线点数"
 			card.Meta.Notification.Data[3].Value = strconv.Itoa(result["ranking_3"])
-			card.Meta.Notification.Title = "凛的可爱探索大作战"
+			card.Meta.Notification.Title = "Guilty Kiss 的作风!"
 			msg, err := json.Marshal(card)
 			if err != nil {
 				logrus.Warn("Marshal failed: ", err.Error())
@@ -214,7 +214,7 @@ func GetData() (map[string]int, error) {
 
 func GetETA() string {
 	now := time.Now().Local()
-	end, _ := time.ParseInLocation("2006-01-02 15:04:05", "2021-03-22 14:00:00", time.Local)
+	end, _ := time.ParseInLocation("2006-01-02 15:04:05", "2021-04-06 14:00:00", time.Local)
 	if now.After(end) {
 		return "已结束"
 	}
