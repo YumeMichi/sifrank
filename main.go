@@ -234,7 +234,7 @@ func main() {
 			}
 			groups := []string{"794573579", "728481207"}
 			//groups := []string{"74735535"}
-			msg := fmt.Sprintf("【LoveLive! 国服档线提醒小助手】\n当前活动: Guilty Kiss 的作风!\n剩余时间: %s\n一档线点数: %d\n二档线点数: %d\n三档线点数: %d", bot.GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
+			msg := fmt.Sprintf("【LoveLive! 国服档线提醒小助手】\n当前活动: Guilty Kiss 的作风!\n剩余时间: %s\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s", bot.GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
 			client := http.Client{Timeout: time.Second * 5}
 			for _, v := range groups {
 				req, err := http.NewRequest("GET", "http://127.0.0.1:5700/send_group_msg?group_id="+v+"&message="+url.QueryEscape(msg), nil)

@@ -13,7 +13,6 @@ package bot
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
@@ -101,7 +100,7 @@ func init() {
 				ctx.Send("【LoveLive! 国服档线小助手】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=1157490807]")
 				return
 			}
-			msg := fmt.Sprintf("【LoveLive! 国服档线小助手】\n当前活动: Guilty Kiss 的作风!\n剩余时间: %s\n一档线点数: %d\n二档线点数: %d\n三档线点数: %d", GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
+			msg := fmt.Sprintf("【LoveLive! 国服档线小助手】\n当前活动: Guilty Kiss 的作风!\n剩余时间: %s\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s", GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
 			ctx.Send(message.Text(msg))
 		})
 
@@ -127,11 +126,11 @@ func init() {
 			card.Meta.Notification.Data[0].Title = "结束时间"
 			card.Meta.Notification.Data[0].Value = GetETA()
 			card.Meta.Notification.Data[1].Title = "一档线点数"
-			card.Meta.Notification.Data[1].Value = strconv.Itoa(result["ranking_1"])
+			card.Meta.Notification.Data[1].Value = result["ranking_1"]
 			card.Meta.Notification.Data[2].Title = "二档线点数"
-			card.Meta.Notification.Data[2].Value = strconv.Itoa(result["ranking_2"])
+			card.Meta.Notification.Data[2].Value = result["ranking_2"]
 			card.Meta.Notification.Data[3].Title = "三档线点数"
-			card.Meta.Notification.Data[3].Value = strconv.Itoa(result["ranking_3"])
+			card.Meta.Notification.Data[3].Value = result["ranking_3"]
 			card.Meta.Notification.Title = "Guilty Kiss 的作风!"
 			msg, err := json.Marshal(card)
 			if err != nil {
@@ -145,8 +144,8 @@ func init() {
 		})
 }
 
-func GetData() (map[string]int, error) {
-	ret := make(map[string]int)
+func GetData() (map[string]string, error) {
+	ret := make(map[string]string)
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     "127.0.0.1:6379",
 		Password: "",
@@ -155,7 +154,7 @@ func GetData() (map[string]int, error) {
 	result, err := rdb.HGetAll(ctx, "request_header").Result()
 	if err != nil {
 		logrus.Warn("No request header: ", err.Error())
-		return map[string]int{}, err
+		return map[string]string{}, err
 	}
 	for k, v := range result {
 		requestData, err := rdb.HGet(ctx, "request_data", k).Result()
@@ -196,14 +195,15 @@ func GetData() (map[string]int, error) {
 			logrus.Warn("Unmarshal failed: ", err.Error())
 			continue
 		}
+
 		items := res.ResponseData.Items
 		itemLen := len(items)
 		if itemLen == 0 {
-			_ = resp.Body.Close()
-			return map[string]int{}, errors.New(string(body))
+			ret[k] = "暂无数据"
+		} else {
+			result := items[itemLen-1]
+			ret[k] = strconv.Itoa(result.Score)
 		}
-		result := items[itemLen-1]
-		ret[k] = result.Score
 
 		_ = resp.Body.Close()
 
