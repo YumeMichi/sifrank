@@ -8,6 +8,7 @@
 // This binary provides sample code for using the gopacket TCP assembler and TCP
 // stream reader.  It reads packets off the wire and reconstructs HTTP requests
 // it sees, logging them.
+//
 package bot
 
 import (
