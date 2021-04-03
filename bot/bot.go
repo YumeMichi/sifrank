@@ -92,7 +92,7 @@ type CardInfo struct {
 var ctx = context.Background()
 
 func init() {
-	rankRule := zero.FullMatchRule("档线")
+	rankRule := zero.FullMatchRule("档线", "dx")
 	zero.OnMessage(rankRule).SetBlock(true).SetPriority(10).
 		Handle(func(ctx *zero.Ctx) {
 			result, err := GetData()
@@ -106,7 +106,7 @@ func init() {
 			ctx.Send(message.Text(msg))
 		})
 
-	cardRule := zero.FullMatchRule("查询档线")
+	cardRule := zero.FullMatchRule("查询档线（暂停使用）")
 	zero.OnMessage(cardRule).SetBlock(true).SetPriority(1).
 		Handle(func(ctx *zero.Ctx) {
 			result, err := GetData()

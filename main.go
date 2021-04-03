@@ -29,14 +29,22 @@ import (
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/driver"
 	"io"
-	"io/ioutil"
 	"net/http"
-	"net/url"
 	"sifrank/bot"
 	"sifrank/config"
+	"sifrank/db"
 	"strings"
 	"time"
 )
+
+type RankData struct {
+	Id         int    `db:"id"`
+	Rank       string `db:"rank"`
+	RankDetail string `db:"rank_detail"`
+	Score      int    `db:"score"`
+	DataDate   string `db:"data_date"`
+	DataTime   string `db:"data_time"`
+}
 
 var ctx = context.Background()
 var ranking = ""
@@ -223,25 +231,38 @@ func main() {
 			// Every minute, flush connections that haven't seen activity in the past 2 minutes.
 			assembler.FlushOlderThan(time.Now().Add(time.Minute * -2))
 		case t := <-timer:
-			if (t.Hour() == 8 || t.Hour() == 14) && t.Minute() == 59 && t.Second() == 50 {
+			if t.Hour() == 23 && t.Minute() == 59 && t.Second() == 50 {
 				result, err := bot.GetData()
 				if err != nil || len(result) != 3 {
 					logrus.Warn(err)
 					return
 				}
-				groups := config.Conf.Groups
-				//groups := []string{"74735535"}
-				msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: %s\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s", config.Conf.AppName, config.Conf.EventName, bot.GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
-				client := http.Client{Timeout: time.Second * 5}
-				for _, v := range groups {
-					req, err := http.NewRequest("GET", "http://127.0.0.1:5700/send_group_msg?group_id="+v+"&message="+url.QueryEscape(msg), nil)
+				for k, v := range result {
+					dt := time.Now().Local().Format("2006-01-02")
+					ts := time.Now().Unix()
+					var data []RankData
+					err := db.MysqlClient.Select(&data, "SELECT * FROM rank_data WHERE rank = ? AND data_date = ?", k, dt)
 					if err != nil {
-						logrus.Warn("Send group message failed: ", err.Error())
-						return
+						logrus.Warn("Select SQL failed. ", err.Error())
+						continue
 					}
-					resp, _ := client.Do(req)
-					body, _ := ioutil.ReadAll(resp.Body)
-					logrus.Info(string(body))
+					if len(data) > 0 {
+						ret, err := db.MysqlClient.Exec("UPDATE rank_data SET score = ?, data_date = ?, data_time = ? WHERE id = ?", v, dt, ts, data[0].Id)
+						if err != nil {
+							logrus.Warn("Update SQL failed. ", err.Error())
+							continue
+						}
+						row, _ := ret.RowsAffected()
+						logrus.Info("Update successfully. Rows affected: ", row)
+					} else {
+						ret, err := db.MysqlClient.Exec("INSERT INTO rank_data (rank, rank_detail, score, data_date, data_time) VALUES (?, ?, ?, ?, ?)", k, k, v, dt, ts)
+						if err != nil {
+							logrus.Warn("Insert SQL failed. ", err.Error())
+							continue
+						}
+						id, _ := ret.LastInsertId()
+						logrus.Info("Insert successfully. Id: ", id)
+					}
 				}
 			}
 		}

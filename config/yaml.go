@@ -35,6 +35,11 @@ type YamlConfigs struct {
 	RedisPort     string   `yaml:"redis_port"`
 	RedisPassword string   `yaml:"redis_password"`
 	RedisDb       int      `yaml:"redis_db"`
+	MysqlHost     string   `yaml:"mysql_host"`
+	MysqlPort     string   `yaml:"mysql_port"`
+	MysqlUser     string   `yaml:"mysql_user"`
+	MysqlPassword string   `yaml:"mysql_password"`
+	MysqlDb       string   `yaml:"mysql_db"`
 	Groups        []string `yaml:"groups"`
 	AppName       string   `yaml:"app_name"`
 	EventName     string   `yaml:"event_name"`
@@ -58,6 +63,11 @@ func DefaultConfigs() *YamlConfigs {
 		RedisPort:     "6379",
 		RedisPassword: "",
 		RedisDb:       0,
+		MysqlHost:     "127.0.0.1",
+		MysqlPort:     "3306",
+		MysqlUser:     "root",
+		MysqlPassword: "",
+		MysqlDb:       "sifrank",
 		Groups:        []string{},
 		AppName:       "LoveLive! 国服档线小助手",
 		EventName:     "",
