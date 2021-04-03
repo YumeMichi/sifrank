@@ -90,20 +90,37 @@ type CardInfo struct {
 }
 
 var ctx = context.Background()
+var rdb *redis.Client
 
 func init() {
+	rdb = redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%s", config.Conf.RedisHost, config.Conf.RedisPort),
+		Password: config.Conf.RedisPassword,
+		DB:       config.Conf.RedisDb,
+	})
+
 	rankRule := zero.FullMatchRule("档线", "dx")
 	zero.OnMessage(rankRule).SetBlock(true).SetPriority(10).
-		Handle(func(ctx *zero.Ctx) {
+		Handle(func(context *zero.Ctx) {
+			lock, _ := rdb.Get(ctx, "dx_lock").Result()
+			if lock != "" {
+				context.Send(message.Text("查询过于频繁！"))
+				return
+			}
+			err := rdb.Set(ctx, "dx_lock", "1", time.Second*10).Err()
+			if err != nil {
+				logrus.Warn(err.Error())
+				return
+			}
 			result, err := GetData()
 			if err != nil || len(result) != 3 {
 				logrus.Warn(err)
 				dir, _ := os.Getwd()
-				ctx.Send("【" + config.Conf.AppName + "】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=" + config.Conf.AdminUser + "]")
+				context.Send("【" + config.Conf.AppName + "】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=" + config.Conf.AdminUser + "]")
 				return
 			}
 			msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: %s\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s", config.Conf.AppName, config.Conf.EventName, GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
-			ctx.Send(message.Text(msg))
+			context.Send(message.Text(msg))
 		})
 
 	cardRule := zero.FullMatchRule("查询档线（暂停使用）")
@@ -148,11 +165,6 @@ func init() {
 
 func GetData() (map[string]string, error) {
 	ret := make(map[string]string)
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", config.Conf.RedisHost, config.Conf.RedisPort),
-		Password: config.Conf.RedisPassword,
-		DB:       config.Conf.RedisDb,
-	})
 	result, err := rdb.HGetAll(ctx, "request_header").Result()
 	if err != nil {
 		logrus.Warn("No request header: ", err.Error())
