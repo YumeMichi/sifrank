@@ -10,7 +10,7 @@ super_users:
 admin_user: "1157490807"
 cqhttp_host: 127.0.0.1
 cqhttp_port: "6700"
-access_token: ""
+access_token: "klab"
 redis_host: 127.0.0.1
 redis_port: "6379"
 redis_password: ""
