@@ -15,15 +15,15 @@ redis_host: 127.0.0.1
 redis_port: "6379"
 redis_password: ""
 redis_db: 0
-mysql_host: 192.168.1.7
+mysql_host: 127.0.0.1
 mysql_port: "3306"
 mysql_user: "root"
-mysql_password: ""
+mysql_password: "sifrank"
 mysql_db: "sifrank"
 groups:
     - "728481207"
     - "794573579"
 app_name: LoveLive! 国服档线小助手
-event_name: "Guilty Kiss 的作风!"
-end_time: "2021-04-06 14:00:00"
+event_name: "想为大家做的事"
+end_time: "2021-04-22 14:00:00"
 icon_url: https://c-ssl.duitang.com/uploads/item/201906/07/20190607235250_wtjcy.thumb.1000_0.jpg

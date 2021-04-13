@@ -107,7 +107,7 @@ func init() {
 				context.Send(message.Text("查询过于频繁！"))
 				return
 			}
-			err := rdb.Set(ctx, "dx_lock", "1", time.Second*10).Err()
+			err := rdb.Set(ctx, "dx_lock", "1", time.Second*3).Err()
 			if err != nil {
 				logrus.Warn(err.Error())
 				return
