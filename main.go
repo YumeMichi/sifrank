@@ -135,7 +135,8 @@ func init() {
 		CommandPrefix: "/",
 		SuperUsers:    config.Conf.SuperUsers,
 		Driver: []zero.Driver{
-			driver.NewWebSocketClient(config.Conf.CqhttpHost, config.Conf.CqhttpPort, config.Conf.AccessToken),
+			driver.NewWebSocketClient("ws://" + config.Conf.CqhttpHost + ":" + config.Conf.CqhttpPort, config.Conf.AccessToken),
+			driver.NewWebSocketClient(fmt.Sprintf("ws://%s:%s", config.Conf.CqhttpHost, config.Conf.CqhttpPort), config.Conf.AccessToken),
 		},
 	})
 
