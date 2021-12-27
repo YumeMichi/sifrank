@@ -205,11 +205,11 @@ func main() {
 				if !strings.Contains(v, "eventPlayer") || strings.Contains(v, "HTTP") {
 					continue
 				}
-				if strings.Contains(v, "\"rank\":\"120\"") {
+				if strings.Contains(v, "\"rank\":120") {
 					ranking = "ranking_1"
-				} else if strings.Contains(v, "\"rank\":\"700\"") {
+				} else if strings.Contains(v, "\"rank\":700") {
 					ranking = "ranking_2"
-				} else if strings.Contains(v, "\"rank\":\"2300\"") {
+				} else if strings.Contains(v, "\"rank\":2300") {
 					ranking = "ranking_3"
 				} else {
 					ranking = ""
