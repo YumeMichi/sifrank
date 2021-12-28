@@ -15,6 +15,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/beevik/ntp"
 	"github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
@@ -227,7 +228,11 @@ func GetData() (map[string]string, error) {
 }
 
 func GetETA() string {
-	now := time.Now().Local()
+	now, err := ntp.Time("ntp.aliyun.com")
+	if err != nil {
+		logrus.Warn("NTP error, now using local time.")
+		now = time.Now().Local()
+	}
 	end, _ := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.EndTime, time.Local)
 	if now.After(end) {
 		return "已结束"
