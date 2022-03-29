@@ -16,9 +16,10 @@ require (
 	github.com/modern-go/reflect2 v1.0.2-0.20210109003243-333559e1834b // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/t-tomalak/logrus-easy-formatter v0.0.0-20190827215021-c074f06c5816
+	github.com/tidwall/gjson v1.14.0 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/wdvxdr1123/ZeroBot v1.4.1
 	go.opentelemetry.io/otel v0.20.0 // indirect
-	golang.org/x/sys v0.0.0-20211210111614-af8b64212486 // indirect
+	golang.org/x/sys v0.0.0-20220329152356-43be30ef3008 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )

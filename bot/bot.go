@@ -15,11 +15,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/beevik/ntp"
-	"github.com/go-redis/redis/v8"
-	"github.com/sirupsen/logrus"
-	zero "github.com/wdvxdr1123/ZeroBot"
-	"github.com/wdvxdr1123/ZeroBot/message"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -30,6 +25,12 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/beevik/ntp"
+	"github.com/go-redis/redis/v8"
+	"github.com/sirupsen/logrus"
+	zero "github.com/wdvxdr1123/ZeroBot"
+	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
 type Response struct {
@@ -124,45 +125,6 @@ func init() {
 			context.Send(message.Text(msg))
 		})
 
-	cardRule := zero.FullMatchRule("dxdxd")
-	zero.OnMessage(cardRule).SetBlock(true).SetPriority(1).
-		Handle(func(ctx *zero.Ctx) {
-			result, err := GetData()
-			if err != nil || len(result) != 3 {
-				logrus.Warn(err)
-				dir, _ := os.Getwd()
-				ctx.Send("【" + config.Conf.AppName + "】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=" + config.Conf.AdminUser + "]")
-				return
-			}
-			var card = &CardInfo{}
-			card.App = "com.tencent.miniapp"
-			card.View = "notification"
-			card.Ver = "0.0.0.1"
-			card.Prompt = "[应用]"
-			card.Meta.Notification.AppInfo.AppName = config.Conf.AppName
-			card.Meta.Notification.AppInfo.AppType = 4
-			card.Meta.Notification.AppInfo.AppId = 1109659848
-			card.Meta.Notification.AppInfo.IconUrl = config.Conf.IconUrl
-			card.Meta.Notification.Data[0].Title = "结束时间"
-			card.Meta.Notification.Data[0].Value = GetETA()
-			card.Meta.Notification.Data[1].Title = "一档线点数"
-			card.Meta.Notification.Data[1].Value = result["ranking_1"]
-			card.Meta.Notification.Data[2].Title = "二档线点数"
-			card.Meta.Notification.Data[2].Value = result["ranking_2"]
-			card.Meta.Notification.Data[3].Title = "三档线点数"
-			card.Meta.Notification.Data[3].Value = result["ranking_3"]
-			card.Meta.Notification.Title = config.Conf.EventName
-			msg, err := json.Marshal(card)
-			if err != nil {
-				logrus.Warn("Marshal failed: ", err.Error())
-				return
-			}
-			content := strings.ReplaceAll(string(msg), ",", "&#44;")
-			content = strings.ReplaceAll(content, "[", "&#91;")
-			content = strings.ReplaceAll(content, "]", "&#93;")
-			ctx.Send("[CQ:json,data=" + content + "]")
-		})
-
 	hahaRule := zero.PrefixRule("哈哈", "hhh")
 	zero.OnMessage(hahaRule).SetBlock(true).SetPriority(1).
 		Handle(func(context *zero.Ctx) {
@@ -252,4 +214,3 @@ func GetETA() string {
 		return fmt.Sprintf("%d 分钟", int(minutes))
 	}
 }
-

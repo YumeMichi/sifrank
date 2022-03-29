@@ -17,6 +17,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"sifrank/bot"
+	"sifrank/config"
+	"sifrank/db"
+	"strings"
+	"time"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/examples/util"
@@ -28,13 +36,6 @@ import (
 	easy "github.com/t-tomalak/logrus-easy-formatter"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/driver"
-	"io"
-	"net/http"
-	"sifrank/bot"
-	"sifrank/config"
-	"sifrank/db"
-	"strings"
-	"time"
 )
 
 type RankData struct {
@@ -268,4 +269,3 @@ func main() {
 		}
 	}
 }
-
