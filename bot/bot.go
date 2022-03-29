@@ -124,7 +124,7 @@ func init() {
 			context.Send(message.Text(msg))
 		})
 
-	cardRule := zero.FullMatchRule("查询档线（暂停使用）")
+	cardRule := zero.FullMatchRule("dxdxd")
 	zero.OnMessage(cardRule).SetBlock(true).SetPriority(1).
 		Handle(func(ctx *zero.Ctx) {
 			result, err := GetData()
@@ -161,6 +161,13 @@ func init() {
 			content = strings.ReplaceAll(content, "[", "&#91;")
 			content = strings.ReplaceAll(content, "]", "&#93;")
 			ctx.Send("[CQ:json,data=" + content + "]")
+		})
+
+	hahaRule := zero.PrefixRule("哈哈", "hhh")
+	zero.OnMessage(hahaRule).SetBlock(true).SetPriority(1).
+		Handle(func(context *zero.Ctx) {
+			dir, _ := os.Getwd()
+			context.Send("[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/haha.jpg")) + "]")
 		})
 }
 
