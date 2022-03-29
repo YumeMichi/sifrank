@@ -56,41 +56,6 @@ type ItemData struct {
 	SettingAwardId int         `json:"setting_award_id"`
 }
 
-type CardInfo struct {
-	App         string `json:"app"`
-	Desc        string `json:"desc"`
-	View        string `json:"view"`
-	Ver         string `json:"ver"`
-	Prompt      string `json:"prompt"`
-	AppID       string `json:"appID"`
-	SourceName  string `json:"sourceName"`
-	ActionData  string `json:"actionData"`
-	ActionDataA string `json:"actionData_A"`
-	SourceUrl   string `json:"sourceUrl"`
-	Meta        struct {
-		Notification struct {
-			AppInfo struct {
-				AppName string `json:"appName"`
-				AppType int    `json:"appType"`
-				AppId   int    `json:"appid"`
-				IconUrl string `json:"iconUrl"`
-			} `json:"appInfo"`
-			Data [4]struct {
-				Title string `json:"title"`
-				Value string `json:"value"`
-			} `json:"data"`
-			Title  string `json:"title"`
-			Button [0]struct {
-				Name   string `json:"name"`
-				Action string `json:"action"`
-			} `json:"button"`
-			EmphasisKeyword string `json:"emphasis_keyword"`
-		} `json:"notification"`
-	} `json:"meta"`
-	Text     string `json:"text"`
-	SourceAd string `json:"sourceAd"`
-}
-
 var ctx = context.Background()
 var rdb *redis.Client
 
