@@ -26,5 +26,20 @@ groups:
     - "580235177"
 app_name: LoveLive! 国服档线小助手
 event_name: "暑假不要结束"
+start_time: "2022-03-28 15:00:00"
 end_time: "2022-04-08 14:00:00"
-icon_url: https://c-ssl.duitang.com/uploads/item/201906/07/20190607235250_wtjcy.thumb.1000_0.jpg
+dq_x_offset: 62
+dq_x_step: 160
+dq_x_extra: 15
+dq_y_offset: 178
+dq_y_step: 46
+dq_title: "国服 第45次 SCORE MATCH 《暑假不要结束》\t善/千鞠\t03.28-04.08"
+dq_subtitle: "* 水团双人卡 50% 加成"
+dq_font_name: "./assets/fonts/simsun.ttc"
+dq_font_size: 32
+dq_title_x_offset: 400
+dq_title_y_offset: 60
+dq_subtitle_x_offset: 1800
+dq_subtitle_y_offset: 60
+dq_base_image: "./assets/images/base.jpg"
+dq_output_dir: "./temp"

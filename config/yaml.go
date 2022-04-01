@@ -12,67 +12,98 @@
 package config
 
 import (
-	"github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
 	"os"
 	"sifrank/utils"
 	"strconv"
 	"time"
+
+	"github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 )
 
 type YamlConfigs struct {
-	Iface         string   `yaml:"iface"`
-	Fname         string   `yaml:"fname"`
-	Snaplen       int      `yaml:"snaplen"`
-	Filter        string   `yaml:"filter"`
-	NickName      []string `yaml:"nickname"`
-	SuperUsers    []string `yaml:"super_users"`
-	AdminUser     string   `yaml:"admin_user"`
-	CqhttpHost    string   `yaml:"cqhttp_host"`
-	CqhttpPort    string   `yaml:"cqhttp_port"`
-	AccessToken   string   `yaml:"access_token"`
-	RedisHost     string   `yaml:"redis_host"`
-	RedisPort     string   `yaml:"redis_port"`
-	RedisPassword string   `yaml:"redis_password"`
-	RedisDb       int      `yaml:"redis_db"`
-	MysqlHost     string   `yaml:"mysql_host"`
-	MysqlPort     string   `yaml:"mysql_port"`
-	MysqlUser     string   `yaml:"mysql_user"`
-	MysqlPassword string   `yaml:"mysql_password"`
-	MysqlDb       string   `yaml:"mysql_db"`
-	Groups        []string `yaml:"groups"`
-	AppName       string   `yaml:"app_name"`
-	EventName     string   `yaml:"event_name"`
-	EndTime       string   `yaml:"end_time"`
-	IconUrl       string   `yaml:"icon_url"`
+	Iface             string   `yaml:"iface"`
+	Fname             string   `yaml:"fname"`
+	Snaplen           int      `yaml:"snaplen"`
+	Filter            string   `yaml:"filter"`
+	NickName          []string `yaml:"nickname"`
+	SuperUsers        []string `yaml:"super_users"`
+	AdminUser         string   `yaml:"admin_user"`
+	CqhttpHost        string   `yaml:"cqhttp_host"`
+	CqhttpPort        string   `yaml:"cqhttp_port"`
+	AccessToken       string   `yaml:"access_token"`
+	RedisHost         string   `yaml:"redis_host"`
+	RedisPort         string   `yaml:"redis_port"`
+	RedisPassword     string   `yaml:"redis_password"`
+	RedisDb           int      `yaml:"redis_db"`
+	MysqlHost         string   `yaml:"mysql_host"`
+	MysqlPort         string   `yaml:"mysql_port"`
+	MysqlUser         string   `yaml:"mysql_user"`
+	MysqlPassword     string   `yaml:"mysql_password"`
+	MysqlDb           string   `yaml:"mysql_db"`
+	Groups            []string `yaml:"groups"`
+	AppName           string   `yaml:"app_name"`
+	EventName         string   `yaml:"event_name"`
+	StartTime         string   `yaml:"start_time"`
+	EndTime           string   `yaml:"end_time"`
+	DqXOffset         int      `yaml:"dq_x_offset"`
+	DqXStep           int      `yaml:"dq_x_step"`
+	DqXExtra          int      `yaml:"dq_x_extra"`
+	DqYOffset         int      `yaml:"dq_y_offset"`
+	DqYStep           int      `yaml:"dq_y_step"`
+	DqTitle           string   `yaml:"dq_title"`
+	DqSubtitle        string   `yaml:"dq_subtitle"`
+	DqFontName        string   `yaml:"dq_font_name"`
+	DqFontSize        float64  `yaml:"dq_font_size"`
+	DqTitleXOffset    float64  `yaml:"dq_title_x_offset"`
+	DqTitleYOffset    float64  `yaml:"dq_title_y_offset"`
+	DqSubtitleXOffset float64  `yaml:"dq_subtitle_x_offset"`
+	DqSubtitleYOffset float64  `yaml:"dq_subtitle_y_offset"`
+	DqBaseImage       string   `yaml:"dq_base_image"`
+	DqOutputDir       string   `yaml:"dq_output_dir"`
 }
 
 func DefaultConfigs() *YamlConfigs {
 	return &YamlConfigs{
-		Iface:         "enp8s0",
-		Fname:         "",
-		Snaplen:       1600,
-		Filter:        "tcp and port 80",
-		NickName:      []string{"YumeMichi"},
-		SuperUsers:    []string{"785569962", "1157490807"},
-		AdminUser:     "1157490807",
-		CqhttpHost:    "127.0.0.1",
-		CqhttpPort:    "6700",
-		AccessToken:   "",
-		RedisHost:     "127.0.0.1",
-		RedisPort:     "6379",
-		RedisPassword: "",
-		RedisDb:       0,
-		MysqlHost:     "127.0.0.1",
-		MysqlPort:     "3306",
-		MysqlUser:     "root",
-		MysqlPassword: "",
-		MysqlDb:       "sifrank",
-		Groups:        []string{},
-		AppName:       "LoveLive! 国服档线小助手",
-		EventName:     "",
-		EndTime:       "",
-		IconUrl:       "https://c-ssl.duitang.com/uploads/item/201906/07/20190607235250_wtjcy.thumb.1000_0.jpg",
+		Iface:             "enp8s0",
+		Fname:             "",
+		Snaplen:           1600,
+		Filter:            "tcp and port 80",
+		NickName:          []string{"YumeMichi"},
+		SuperUsers:        []string{"785569962", "1157490807"},
+		AdminUser:         "1157490807",
+		CqhttpHost:        "127.0.0.1",
+		CqhttpPort:        "6700",
+		AccessToken:       "",
+		RedisHost:         "127.0.0.1",
+		RedisPort:         "6379",
+		RedisPassword:     "",
+		RedisDb:           0,
+		MysqlHost:         "127.0.0.1",
+		MysqlPort:         "3306",
+		MysqlUser:         "root",
+		MysqlPassword:     "",
+		MysqlDb:           "sifrank",
+		Groups:            []string{},
+		AppName:           "LoveLive! 国服档线小助手",
+		EventName:         "",
+		StartTime:         "",
+		EndTime:           "",
+		DqXOffset:         62,
+		DqXStep:           160,
+		DqXExtra:          15,
+		DqYOffset:         178,
+		DqYStep:           46,
+		DqTitle:           "活动标题",
+		DqSubtitle:        "活动子标题",
+		DqFontName:        "./simsun.ttc",
+		DqFontSize:        32,
+		DqTitleXOffset:    400,
+		DqTitleYOffset:    60,
+		DqSubtitleXOffset: 1800,
+		DqSubtitleYOffset: 60,
+		DqBaseImage:       "./base.jpg",
+		DqOutputDir:       "./temp",
 	}
 }
 
@@ -103,4 +134,3 @@ func (c *YamlConfigs) Save(p string) error {
 	utils.WriteAllText(p, string(data))
 	return nil
 }
-
