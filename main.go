@@ -21,6 +21,8 @@ import (
 	"net/http"
 	"sifrank/bot"
 	"sifrank/config"
+	"sifrank/consts"
+	"sifrank/day"
 	"sifrank/db"
 	"strings"
 	"time"
@@ -38,19 +40,12 @@ import (
 	"github.com/wdvxdr1123/ZeroBot/driver"
 )
 
-type RankData struct {
-	Id         int    `db:"id"`
-	Rank       string `db:"rank"`
-	RankDetail string `db:"rank_detail"`
-	Score      int    `db:"score"`
-	DataDate   string `db:"data_date"`
-	DataTime   string `db:"data_time"`
-}
-
 var ctx = context.Background()
 var ranking = ""
 
 var rdb *redis.Client
+
+var endDate = ""
 
 // Build a simple HTTP request parser using tcpassembly.StreamFactory and tcpassembly.Stream interfaces
 
@@ -152,6 +147,12 @@ func init() {
 		Password: config.Conf.RedisPassword,
 		DB:       config.Conf.RedisDb,
 	})
+
+	d, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.EndTime, time.Local)
+	if err != nil {
+		panic(err)
+	}
+	endDate = d.Format("2006-01-02")
 }
 
 func main() {
@@ -232,7 +233,18 @@ func main() {
 			// Every minute, flush connections that haven't seen activity in the past 2 minutes.
 			assembler.FlushOlderThan(time.Now().Add(time.Minute * -2))
 		case t := <-timer:
-			if t.Hour() == 23 && t.Minute() == 59 && t.Second() == 50 {
+			// 是否活动结束当天
+			h, m, s := t.Clock()
+			currentDate := t.Local().Format("2006-01-02")
+			var hOffset, mOffset, sOffset int
+			if currentDate == endDate {
+				hOffset = 13
+			} else {
+				hOffset = 23
+			}
+			mOffset = 59
+			sOffset = 50
+			if h == hOffset && m == mOffset && s == sOffset {
 				result, err := bot.GetData()
 				if err != nil || len(result) != 3 {
 					logrus.Warn(err)
@@ -240,15 +252,15 @@ func main() {
 				}
 				for k, v := range result {
 					dt := time.Now().Local().Format("2006-01-02")
-					ts := time.Now().Unix()
-					var data []RankData
-					err := db.MysqlClient.Select(&data, "SELECT * FROM rank_data WHERE rank = ? AND data_date = ?", k, dt)
+					ts := time.Now().Local().Format("2006-01-02 15:04:05")
+					var data []day.DayRankData
+					err := db.MysqlClient.Select(&data, "SELECT * FROM day_rank_data WHERE rank = ? AND data_date = ?", k, dt)
 					if err != nil {
 						logrus.Warn("Select SQL failed. ", err.Error())
 						continue
 					}
 					if len(data) > 0 {
-						ret, err := db.MysqlClient.Exec("UPDATE rank_data SET score = ?, data_date = ?, data_time = ? WHERE id = ?", v, dt, ts, data[0].Id)
+						ret, err := db.MysqlClient.Exec("UPDATE day_rank_data SET score = ?, data_time = ? WHERE id = ?", v, ts, data[0].Id)
 						if err != nil {
 							logrus.Warn("Update SQL failed. ", err.Error())
 							continue
@@ -256,7 +268,7 @@ func main() {
 						row, _ := ret.RowsAffected()
 						logrus.Info("Update successfully. Rows affected: ", row)
 					} else {
-						ret, err := db.MysqlClient.Exec("INSERT INTO rank_data (rank, rank_detail, score, data_date, data_time) VALUES (?, ?, ?, ?, ?)", k, k, v, dt, ts)
+						ret, err := db.MysqlClient.Exec("INSERT INTO day_rank_data (rank, rank_code, score, data_date, data_time) VALUES (?, ?, ?, ?, ?)", k, consts.RankCode[k], v, dt, ts)
 						if err != nil {
 							logrus.Warn("Insert SQL failed. ", err.Error())
 							continue
