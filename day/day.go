@@ -75,7 +75,7 @@ func GenDayRankPic() (string, error) {
 		var dayRanks []DayRankData
 		err := db.MysqlClient.Select(&dayRanks, "SELECT * FROM day_rank_data WHERE data_date = ? ORDER BY rank ASC", rankDate)
 		if err != nil {
-			panic(err)
+			return "", err
 		}
 		if len(dayRanks) == 0 {
 			break
