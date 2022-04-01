@@ -14,11 +14,13 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"os/exec"
 	"sifrank/bot"
 	"sifrank/config"
 	"sifrank/consts"
@@ -188,7 +190,8 @@ func main() {
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	packets := packetSource.Packets()
 	ticker := time.Tick(time.Minute)
-	timer := time.Tick(time.Second)
+	dayTimer := time.Tick(time.Second)
+	ntpTimer := time.Tick(time.Hour * 6)
 	for {
 		select {
 		case packet := <-packets:
@@ -232,7 +235,18 @@ func main() {
 		case <-ticker:
 			// Every minute, flush connections that haven't seen activity in the past 2 minutes.
 			assembler.FlushOlderThan(time.Now().Add(time.Minute * -2))
-		case t := <-timer:
+		case <-ntpTimer:
+			cmd := exec.Command("/usr/bin/ntpdate", "ntp.aliyun.com")
+			cmd.Stderr = &bytes.Buffer{}
+			cmd.Stdout = &bytes.Buffer{}
+			err := cmd.Run()
+			if err != nil {
+				logrus.Warn(err.Error())
+				logrus.Warn(cmd.Stderr.(*bytes.Buffer).String())
+			} else {
+				logrus.Info(cmd.Stdout.(*bytes.Buffer).String())
+			}
+		case t := <-dayTimer:
 			// 是否活动结束当天
 			h, m, s := t.Clock()
 			currentDate := t.Local().Format("2006-01-02")
