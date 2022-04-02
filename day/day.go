@@ -40,7 +40,8 @@ type DayRankData struct {
 
 func GenDayRankPic() (string, error) {
 	startDate, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.StartTime, time.Local)
-	fileName := startDate.Format("2006-01-02")
+	// fileName := startDate.Format("2006-01-02")
+	fileName := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
 	if err != nil {
 		return "", err
 	}
