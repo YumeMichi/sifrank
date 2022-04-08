@@ -247,6 +247,11 @@ func main() {
 				logrus.Info(cmd.Stdout.(*bytes.Buffer).String())
 			}
 		case t := <-dayTimer:
+			// 是否活动已结束
+			et, _ := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.EndTime, time.Local)
+			if t.Unix() > et.Unix() {
+				continue
+			}
 			// 是否活动结束当天
 			h, m, s := t.Clock()
 			currentDate := t.Local().Format("2006-01-02")
