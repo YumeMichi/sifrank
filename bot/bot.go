@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 	"sifrank/config"
 	"sifrank/day"
+	"sifrank/db"
 	"strconv"
 	"strings"
 	"time"
@@ -70,12 +71,30 @@ func init() {
 	rankRule := zero.FullMatchRule("档线", "dx")
 	zero.OnMessage(rankRule).SetBlock(true).SetPriority(10).
 		Handle(func(context *zero.Ctx) {
+			now := time.Now()
+			ed, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.EndTime, time.Local)
+			eds := ed.Format("2006-01-02")
+			if err != nil {
+				logrus.Warn(err.Error())
+				return
+			}
+			if now.After(ed) {
+				var dk []day.DayRankData
+				err = db.MysqlClient.Select(&dk, "SELECT * FROM day_rank_data WHERE data_date = ? ORDER BY rank ASC", eds)
+				if err != nil {
+					logrus.Warn(err.Error())
+					return
+				}
+				msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: 已结束\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s\n========================\n回复 dq/当期档线/本期档线 可查看每日档线数据", config.Conf.AppName, config.Conf.EventName, strconv.Itoa(dk[0].Score), strconv.Itoa(dk[1].Score), strconv.Itoa(dk[2].Score))
+				context.Send(message.Text(msg))
+				return
+			}
 			lock, _ := rdb.Get(ctx, "dx_lock").Result()
 			if lock != "" {
 				context.Send(message.Text("查询过于频繁！"))
 				return
 			}
-			err := rdb.Set(ctx, "dx_lock", "1", time.Second*3).Err()
+			err = rdb.Set(ctx, "dx_lock", "1", time.Second*3).Err()
 			if err != nil {
 				logrus.Warn(err.Error())
 				return
@@ -87,7 +106,7 @@ func init() {
 				context.Send("【" + config.Conf.AppName + "】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=" + config.Conf.AdminUser + "]")
 				return
 			}
-			msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: %s\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s\n=======================\n回复 dq/当期档线/本期档线 可查看每日档线数据", config.Conf.AppName, config.Conf.EventName, GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
+			msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: %s\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s\n========================\n回复 dq/当期档线/本期档线 可查看每日档线数据", config.Conf.AppName, config.Conf.EventName, GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
 			context.Send(message.Text(msg))
 		})
 

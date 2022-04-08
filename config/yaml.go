@@ -91,7 +91,7 @@ func DefaultConfigs() *YamlConfigs {
 		EndTime:           "",
 		DqXOffset:         62,
 		DqXStep:           160,
-		DqXExtra:          15,
+		DqXExtra:          14,
 		DqYOffset:         178,
 		DqYStep:           46,
 		DqTitle:           "活动标题",

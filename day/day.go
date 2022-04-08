@@ -40,13 +40,21 @@ type DayRankData struct {
 
 func GenDayRankPic() (string, error) {
 	startDate, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.StartTime, time.Local)
-	// fileName := startDate.Format("2006-01-02")
-	fileName := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
 	if err != nil {
 		return "", err
 	}
+	endDate, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.EndTime, time.Local)
+	if err != nil {
+		return "", err
+	}
+	now := time.Now().Format("2006-01-02")
+	isEnd := now == endDate.Format("2006-01-02")
+	fileName := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
+	if isEnd {
+		fileName = now
+	}
 	savePath := config.Conf.DqOutputDir + "/" + fileName + ".png"
-	if utils.PathExists(config.Conf.DqOutputDir + "/" + fileName + ".png") {
+	if !isEnd && utils.PathExists(config.Conf.DqOutputDir+"/"+fileName+".png") {
 		return savePath, nil
 	}
 	img, err := gg.LoadImage(config.Conf.DqBaseImage)
