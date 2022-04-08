@@ -257,7 +257,7 @@ func main() {
 				hOffset = 23
 			}
 			mOffset = 59
-			sOffset = 50
+			sOffset = 55
 			if h == hOffset && m == mOffset && s == sOffset {
 				result, err := bot.GetData()
 				if err != nil || len(result) != 3 {
