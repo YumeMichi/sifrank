@@ -20,7 +20,9 @@ type KeywordEntry struct {
 	Dt      string `db:"dt"`
 }
 
-var keywords = []string{}
+var (
+	keywords []string
+)
 
 func init() {
 	err := loadKeywords()
@@ -32,11 +34,12 @@ func init() {
 	entryRule := zero.PrefixRule("添加词条_")
 	zero.OnMessage(entryRule).SetBlock(true).SetPriority(10).
 		Handle(func(context *zero.Ctx) {
+			cq := message.At(context.Event.Sender.ID)
 			msg := context.MessageString()
 			msgList := strings.SplitN(msg, "_", 3)
 			fmt.Println(msgList)
 			if len(msgList) != 3 {
-				context.Send(message.Text("格式有误！"))
+				context.Send(cq.String() + "格式有误！")
 				return
 			}
 			key := msgList[1]
@@ -52,7 +55,7 @@ func init() {
 				return
 			}
 			if len(entry) > 0 {
-				context.Send(message.Text("该词条已存在！"))
+				context.Send(cq.String() + "该词条已存在！")
 				return
 			}
 			dt := time.Now().Format("2006-01-02 15:04:05")
@@ -62,24 +65,9 @@ func init() {
 				return
 			}
 			id, _ := ret.LastInsertId()
-			logrus.Info("Insert successfully. Id: ", id)
+			logrus.Debug("Insert successfully. Id: ", id)
 			loadKeywords()
-			context.Send(message.Text("词条 " + key + " 添加成功！"))
-		})
-
-	// 完全匹配词条
-	keywordRule := zero.KeywordRule(keywords...)
-	zero.OnMessage(keywordRule).SetBlock(true).SetPriority(10).
-		Handle(func(context *zero.Ctx) {
-			key := context.MessageString()
-			group := context.Event.GroupID
-			var entry []KeywordEntry
-			err := db.MysqlClient.Select(&entry, "SELECT * FROM `keyword_entry` WHERE `keyword` = ? AND `group` = ?", key, group)
-			if err != nil {
-				logrus.Warn(err.Error())
-				return
-			}
-			context.Send(entry[0].Content)
+			context.Send(cq.String() + "词条 " + key + " 添加成功！")
 		})
 
 	// 查找词条
@@ -111,5 +99,24 @@ func loadKeywords() error {
 		keywords = append(keywords, v.Keyword)
 	}
 	logrus.Debug(keywords)
+	reloadKeywordsSearch()
 	return nil
+}
+
+func reloadKeywordsSearch() {
+	// 完全匹配词条
+	keywordRule := zero.FullMatchRule(keywords...)
+	zero.OnMessage(keywordRule).SetBlock(true).SetPriority(10).
+		Handle(func(context *zero.Ctx) {
+			key := context.MessageString()
+			group := context.Event.GroupID
+			var entry []KeywordEntry
+			err := db.MysqlClient.Select(&entry, "SELECT * FROM `keyword_entry` WHERE `keyword` = ? AND `group` = ?", key, group)
+			if err != nil {
+				logrus.Warn(err.Error())
+				return
+			}
+			cq := message.At(context.Event.Sender.ID)
+			context.Send(cq.String() + "\n" + entry[0].Content)
+		})
 }
