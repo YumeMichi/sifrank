@@ -110,20 +110,6 @@ func init() {
 			context.Send(message.Text(msg))
 		})
 
-	hahaRule := zero.PrefixRule("哈哈", "hhh")
-	zero.OnMessage(hahaRule).SetBlock(true).SetPriority(1).
-		Handle(func(context *zero.Ctx) {
-			dir, _ := os.Getwd()
-			context.Send("[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/haha.jpg")) + "]")
-		})
-
-	qmRule := zero.PrefixRule("?", "？", "嗯？", "嗯?")
-	zero.OnMessage(qmRule).SetBlock(true).SetPriority(1).
-		Handle(func(context *zero.Ctx) {
-			dir, _ := os.Getwd()
-			context.Send("[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/qm.jpg")) + "]")
-		})
-
 	dayRankRule := zero.PrefixRule("当期", "当期档线", "本期档线", "dq")
 	zero.OnMessage(dayRankRule).SetBlock(true).SetPriority(1).
 		Handle(func(context *zero.Ctx) {
