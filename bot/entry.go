@@ -32,7 +32,7 @@ func init() {
 
 	// 添加词条
 	entryRule := zero.PrefixRule("添加词条_")
-	zero.OnMessage(entryRule).SetBlock(true).SetPriority(10).
+	zero.OnMessage(entryRule, zero.OnlyToMe).SetBlock(true).SetPriority(10).
 		Handle(func(context *zero.Ctx) {
 			cq := message.At(context.Event.Sender.ID)
 			msg := context.MessageString()
@@ -72,7 +72,7 @@ func init() {
 
 	// 查找词条
 	searchRule := zero.PrefixRule("查询词条")
-	zero.OnMessage(searchRule).SetBlock(true).SetPriority(10).
+	zero.OnMessage(searchRule, zero.OnlyToMe).SetBlock(true).SetPriority(10).
 		Handle(func(context *zero.Ctx) {
 			msg := context.MessageString()
 			msgList := strings.Split(msg, "查询词条")
@@ -106,7 +106,7 @@ func loadKeywords() error {
 func reloadKeywordsSearch() {
 	// 完全匹配词条
 	keywordRule := zero.FullMatchRule(keywords...)
-	zero.OnMessage(keywordRule).SetBlock(true).SetPriority(10).
+	zero.OnMessage(keywordRule, zero.OnlyToMe).SetBlock(true).SetPriority(10).
 		Handle(func(context *zero.Ctx) {
 			key := context.MessageString()
 			group := context.Event.GroupID
