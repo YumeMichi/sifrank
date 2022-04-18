@@ -69,8 +69,8 @@ func GenDayRankPic() (string, error) {
 	}
 	// 档线大标题
 	dc.DrawString(config.Conf.DqTitle, config.Conf.DqTitleXOffset, config.Conf.DqTitleYOffset)
-	dc.SetRGB(1, 0, 0)
 	if config.Conf.DqSubtitle != "" {
+		dc.SetRGB(1, 0, 0)
 		dc.DrawString(config.Conf.DqSubtitle, config.Conf.DqSubtitleXOffset, config.Conf.DqSubtitleYOffset)
 		dc.SetRGB(0, 0, 0)
 	}
