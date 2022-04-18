@@ -20,9 +20,9 @@ require (
 	github.com/t-tomalak/logrus-easy-formatter v0.0.0-20190827215021-c074f06c5816
 	github.com/tidwall/gjson v1.14.0 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
-	github.com/wdvxdr1123/ZeroBot v1.4.1
+	github.com/wdvxdr1123/ZeroBot v1.5.0
 	go.opentelemetry.io/otel v0.20.0 // indirect
 	golang.org/x/image v0.0.0-20220321031419-a8550c1d254a // indirect
-	golang.org/x/sys v0.0.0-20220329152356-43be30ef3008 // indirect
+	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )

@@ -5,8 +5,8 @@ filter: tcp and port 80
 nickname:
     - YumeMichi
 super_users:
-    - "785569962"
-    - "1157490807"
+    - 785569962
+    - 1157490807
 admin_user: "1157490807"
 cqhttp_host: 127.0.0.1
 cqhttp_port: "6700"
