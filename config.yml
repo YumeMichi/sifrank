@@ -25,16 +25,16 @@ groups:
     - "794573579"
     - "580235177"
 app_name: LoveLive! 国服档线小助手
-event_name: "暑假不要结束"
-start_time: "2022-03-28 15:00:00"
-end_time: "2022-04-08 14:00:00"
+event_name: "μ's 的文化节"
+start_time: "2022-04-14 15:00:00"
+end_time: "2022-04-24 14:00:00"
 dq_x_offset: 62
 dq_x_step: 160
 dq_x_extra: 14
 dq_y_offset: 178
 dq_y_step: 46
-dq_title: "国服 第45次 SCORE MATCH 《暑假不要结束》\t善/千鞠\t03.28-04.08"
-dq_subtitle: "* 水团双人卡 50% 加成"
+dq_title: "国服 第38次 Challenge Festival 《μ's 的文化节》\t果/凛绘\t04.14-04.24"
+dq_subtitle: ""
 dq_font_name: "./assets/fonts/simsun.ttc"
 dq_font_size: 32
 dq_title_x_offset: 400

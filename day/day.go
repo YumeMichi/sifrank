@@ -12,6 +12,7 @@
 package day
 
 import (
+	"math"
 	"sifrank/config"
 	"sifrank/db"
 	"sifrank/utils"
@@ -78,7 +79,11 @@ func GenDayRankPic() (string, error) {
 	dc.DrawString("700", float64(x_offset), float64(y_offset+y_step*1))
 	dc.DrawString("2300", float64(x_offset), float64(y_offset+y_step*2))
 	// 档线数据
-	for i := 1; i <= 12; i++ {
+	dayDiff := int(math.Ceil(endDate.Sub(startDate).Hours() / 24))
+	if err != nil {
+		return "", err
+	}
+	for i := 1; i <= dayDiff; i++ {
 		timeDiff, _ := time.ParseDuration(strconv.Itoa(24*(i-1)) + "h")
 		rankDate := startDate.Add(timeDiff).Format("2006-01-02")
 		var dayRanks []DayRankData
@@ -89,7 +94,7 @@ func GenDayRankPic() (string, error) {
 		if len(dayRanks) == 0 {
 			break
 		}
-		if i == 12 {
+		if i == dayDiff {
 			dc.SetRGB(1, 0, 0)
 		}
 		dc.DrawString(strconv.Itoa(dayRanks[0].Score), float64(x_offset+x_step*i+x_extra*i), float64(y_offset))
