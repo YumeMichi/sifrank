@@ -34,6 +34,7 @@ import (
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/driver"
+	"github.com/wdvxdr1123/ZeroBot/extension/rate"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
@@ -60,7 +61,10 @@ type ItemData struct {
 	SettingAwardId int         `json:"setting_award_id"`
 }
 
-var ctx = context.Background()
+var (
+	ctx     = context.Background()
+	limiter = rate.NewManager[int64](time.Second*5, 1)
+)
 
 func init() {
 	zero.Run(zero.Config{
@@ -72,8 +76,17 @@ func init() {
 		},
 	})
 
+	engine := zero.New()
+	engine.UsePreHandler(func(ctx *zero.Ctx) bool {
+		if !limiter.Load(ctx.Event.GroupID).Acquire() {
+			ctx.Send("查询过于频繁！")
+			return false
+		}
+		return true
+	})
+
 	rankRule := zero.FullMatchRule("档线", "dx")
-	zero.OnMessage(rankRule).SetBlock(true).SetPriority(10).
+	engine.OnMessage(rankRule).SetBlock(true).SetPriority(10).
 		Handle(func(context *zero.Ctx) {
 			now := time.Now()
 			ed, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.EndTime, time.Local)
@@ -93,16 +106,6 @@ func init() {
 				context.Send(message.Text(msg))
 				return
 			}
-			lock, _ := db.RedisClient.Get(ctx, "dx_lock").Result()
-			if lock != "" {
-				context.Send(message.Text("查询过于频繁！"))
-				return
-			}
-			err = db.RedisClient.Set(ctx, "dx_lock", "1", time.Second*3).Err()
-			if err != nil {
-				logrus.Warn(err.Error())
-				return
-			}
 			result, err := GetData()
 			if err != nil || len(result) != 3 {
 				logrus.Warn(err)
@@ -115,7 +118,7 @@ func init() {
 		})
 
 	dayRankRule := zero.PrefixRule("当期", "当期档线", "本期档线", "dq")
-	zero.OnMessage(dayRankRule).SetBlock(true).SetPriority(1).
+	engine.OnMessage(dayRankRule).SetBlock(true).SetPriority(1).
 		Handle(func(context *zero.Ctx) {
 			savePath, err := cmd.GenDayRankPic()
 			if err != nil {
