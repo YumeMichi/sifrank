@@ -1,3 +1,6 @@
+github.com/RomiChan/syncx v0.0.0-20220404072119-d7ea0ae15a4c/go.mod h1:KqZzu7slNKROh3TSYEH/IUMG6f4M+1qubZ5e52QypsE=
+github.com/RomiChan/websocket v1.4.3-0.20220123145318-307a86b127bc h1:AAx50/fb/xS4lvsdQg+bFbGvqSDhyV1MF+p2PLCamZ0=
+github.com/RomiChan/websocket v1.4.3-0.20220123145318-307a86b127bc/go.mod h1:OMmITAib6POA37xCichWM0aRnoVpSMZO1rB/G01wrr0=
 github.com/beevik/ntp v0.3.0 h1:xzVrPrE4ziasFXgBVBZJDP0Wg/KpMwk2KHJ4Ba8GrDw=
 github.com/beevik/ntp v0.3.0/go.mod h1:hIHWr+l3+/clUnF44zdK+CWW7fO8dR5cIylAQ76NRpg=
 github.com/cespare/xxhash/v2 v2.1.1 h1:6MnRN8NT7+YBpUIWxHtefFZOKTAPgGjpQSxqLNn0+qY=
@@ -104,6 +107,7 @@ github.com/tidwall/gjson v1.8.0 h1:Qt+orfosKn0rbNTZqHYDqBrmm3UDA4KRkv70fDzG+PQ=
 github.com/tidwall/gjson v1.8.0/go.mod h1:5/xDoumyyDNerp2U36lyolv46b3uF/9Bu6OfyQ9GImk=
 github.com/tidwall/gjson v1.11.0 h1:C16pk7tQNiH6VlCrtIXL1w8GaOsi1X3W8KDkE1BuYd4=
 github.com/tidwall/gjson v1.11.0/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
+github.com/tidwall/gjson v1.13.0/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
 github.com/tidwall/gjson v1.14.0 h1:6aeJ0bzojgWLa82gDQHcx3S0Lr/O51I9bJ5nv6JFx5w=
 github.com/tidwall/gjson v1.14.0/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
 github.com/tidwall/match v1.0.3 h1:FQUVvBImDutD8wJLN6c5eMzWtjgONK9MwIBCOrUJKeE=
@@ -123,6 +127,8 @@ github.com/wdvxdr1123/ZeroBot v1.2.2 h1:BKEy3l80BMrQWpFWaII0AfFMyf9bqrB0TxfWhTdo
 github.com/wdvxdr1123/ZeroBot v1.2.2/go.mod h1:83nHtG8V5TAxPwH/LCDxLpZk4khIgs29dkr5TBWf7fc=
 github.com/wdvxdr1123/ZeroBot v1.4.1 h1:fk/8RH2D1gB3YeC1eI/SZi/kG31Rh7Z8lAiDc60VZFM=
 github.com/wdvxdr1123/ZeroBot v1.4.1/go.mod h1:7t9m4vDZPwWAmzKlhP6IvUoisOIiqNdm/3AJgiY3+ew=
+github.com/wdvxdr1123/ZeroBot v1.5.0 h1:NIdDs/a5YtsYn7NsQHvsfrw8ZUnFUPtrBz1LqKyk1Gs=
+github.com/wdvxdr1123/ZeroBot v1.5.0/go.mod h1:/DiS/UKTmGtOys9am9bA4i4/jOgXaoEHkjJRjuA/oZs=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 go.opentelemetry.io/otel v0.17.0 h1:6MKOu8WY4hmfpQ4oQn34u6rYhnf2sWf1LXYO/UFm71U=
 go.opentelemetry.io/otel v0.17.0/go.mod h1:Oqtdxmf7UtEvL037ohlgnaYa1h7GtMh0NcSd9eqkC9s=
@@ -187,8 +193,11 @@ golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c h1:F1jZWGFhYfh0Ci55sIpILtKKK
 golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20211210111614-af8b64212486 h1:5hpz5aRr+W1erYCL5JRhSUBJRph7l9XkNveoExlrKYk=
 golang.org/x/sys v0.0.0-20211210111614-af8b64212486/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.0.0-20220111092808-5a964db01320/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220329152356-43be30ef3008 h1:pq9pwoi2rjLWvmiVser/lIOgiyA3fli4M+RfGVMA7nE=
 golang.org/x/sys v0.0.0-20220329152356-43be30ef3008/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.0.0-20220412211240-33da011f77ad h1:ntjMns5wyP/fN65tdBD4g8J5w8n015+iIIs9rtjXkY0=
+golang.org/x/sys v0.0.0-20220412211240-33da011f77ad/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.3/go.mod h1:5Zoc/QRtKVWzQhOtBMvqHzDpF6irO9z98xDceosuGiQ=
