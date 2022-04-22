@@ -21,9 +21,10 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sifrank/cmd"
 	"sifrank/config"
-	"sifrank/day"
 	"sifrank/db"
+	"sifrank/model"
 	"strconv"
 	"strings"
 	"time"
@@ -32,6 +33,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
+	"github.com/wdvxdr1123/ZeroBot/driver"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
@@ -59,13 +61,15 @@ type ItemData struct {
 }
 
 var ctx = context.Background()
-var rdb *redis.Client
 
 func init() {
-	rdb = redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", config.Conf.RedisHost, config.Conf.RedisPort),
-		Password: config.Conf.RedisPassword,
-		DB:       config.Conf.RedisDb,
+	zero.Run(zero.Config{
+		NickName:      config.Conf.NickName,
+		CommandPrefix: "/",
+		SuperUsers:    config.Conf.SuperUsers,
+		Driver: []zero.Driver{
+			driver.NewWebSocketClient(fmt.Sprintf("ws://%s:%s", config.Conf.CqhttpHost, config.Conf.CqhttpPort), config.Conf.AccessToken),
+		},
 	})
 
 	rankRule := zero.FullMatchRule("档线", "dx")
@@ -79,7 +83,7 @@ func init() {
 				return
 			}
 			if now.After(ed) {
-				var dk []day.DayRankData
+				var dk []model.DayRankData
 				err = db.MysqlClient.Select(&dk, "SELECT * FROM day_rank_data WHERE data_date = ? ORDER BY rank ASC", eds)
 				if err != nil {
 					logrus.Warn(err.Error())
@@ -89,12 +93,12 @@ func init() {
 				context.Send(message.Text(msg))
 				return
 			}
-			lock, _ := rdb.Get(ctx, "dx_lock").Result()
+			lock, _ := db.RedisClient.Get(ctx, "dx_lock").Result()
 			if lock != "" {
 				context.Send(message.Text("查询过于频繁！"))
 				return
 			}
-			err = rdb.Set(ctx, "dx_lock", "1", time.Second*3).Err()
+			err = db.RedisClient.Set(ctx, "dx_lock", "1", time.Second*3).Err()
 			if err != nil {
 				logrus.Warn(err.Error())
 				return
@@ -113,7 +117,7 @@ func init() {
 	dayRankRule := zero.PrefixRule("当期", "当期档线", "本期档线", "dq")
 	zero.OnMessage(dayRankRule).SetBlock(true).SetPriority(1).
 		Handle(func(context *zero.Ctx) {
-			savePath, err := day.GenDayRankPic()
+			savePath, err := cmd.GenDayRankPic()
 			if err != nil {
 				logrus.Warn(err.Error())
 				return
@@ -126,13 +130,13 @@ func init() {
 
 func GetData() (map[string]string, error) {
 	ret := make(map[string]string)
-	result, err := rdb.HGetAll(ctx, "request_header").Result()
+	result, err := db.RedisClient.HGetAll(ctx, "request_header").Result()
 	if err != nil {
 		logrus.Warn("No request header: ", err.Error())
 		return map[string]string{}, err
 	}
 	for k, v := range result {
-		requestData, err := rdb.HGet(ctx, "request_data", k).Result()
+		requestData, err := db.RedisClient.HGet(ctx, "request_data", k).Result()
 		if err == redis.Nil {
 			logrus.Warn("No request data for", k)
 			continue

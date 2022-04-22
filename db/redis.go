@@ -9,14 +9,21 @@
 // stream reader.  It reads packets off the wire and reconstructs HTTP requests
 // it sees, logging them.
 //
-package main
+package db
 
-import "sifrank/sched"
+import (
+	"fmt"
+	"sifrank/config"
 
-func main() {
-	go sched.FetchNtpData()
-	go sched.FetchPacketData()
-	go sched.FetchRankData()
+	"github.com/go-redis/redis/v8"
+)
 
-	select {}
+var RedisClient *redis.Client
+
+func init() {
+	RedisClient = redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%s", config.Conf.RedisHost, config.Conf.RedisPort),
+		Password: config.Conf.RedisPassword,
+		DB:       config.Conf.RedisDb,
+	})
 }

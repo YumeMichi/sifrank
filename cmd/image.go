@@ -9,12 +9,13 @@
 // stream reader.  It reads packets off the wire and reconstructs HTTP requests
 // it sees, logging them.
 //
-package day
+package cmd
 
 import (
 	"math"
 	"sifrank/config"
 	"sifrank/db"
+	"sifrank/model"
 	"sifrank/utils"
 	"strconv"
 	"time"
@@ -29,15 +30,6 @@ var (
 	y_offset = config.Conf.DqYOffset
 	y_step   = config.Conf.DqYStep
 )
-
-type DayRankData struct {
-	Id       int    `db:"id"`
-	Rank     string `db:"rank"`
-	RankCode string `db:"rank_code"`
-	Score    int    `db:"score"`
-	DataDate string `db:"data_date"`
-	DataTime string `db:"data_time"`
-}
 
 func GenDayRankPic() (string, error) {
 	startDate, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.StartTime, time.Local)
@@ -86,7 +78,7 @@ func GenDayRankPic() (string, error) {
 	for i := 1; i <= dayDiff; i++ {
 		timeDiff, _ := time.ParseDuration(strconv.Itoa(24*(i-1)) + "h")
 		rankDate := startDate.Add(timeDiff).Format("2006-01-02")
-		var dayRanks []DayRankData
+		var dayRanks []model.DayRankData
 		err := db.MysqlClient.Select(&dayRanks, "SELECT * FROM day_rank_data WHERE data_date = ? ORDER BY rank ASC", rankDate)
 		if err != nil {
 			return "", err

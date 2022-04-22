@@ -9,14 +9,13 @@
 // stream reader.  It reads packets off the wire and reconstructs HTTP requests
 // it sees, logging them.
 //
-package main
+package model
 
-import "sifrank/sched"
-
-func main() {
-	go sched.FetchNtpData()
-	go sched.FetchPacketData()
-	go sched.FetchRankData()
-
-	select {}
+type DayRankData struct {
+	Id       int    `db:"id"`
+	Rank     string `db:"rank"`
+	RankCode string `db:"rank_code"`
+	Score    int    `db:"score"`
+	DataDate string `db:"data_date"`
+	DataTime string `db:"data_time"`
 }
