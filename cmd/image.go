@@ -71,7 +71,7 @@ func GenDayRankPic() (string, error) {
 	dc.DrawString("700", float64(x_offset), float64(y_offset+y_step*1))
 	dc.DrawString("2300", float64(x_offset), float64(y_offset+y_step*2))
 	// 档线数据
-	dayDiff := int(math.Ceil(endDate.Sub(startDate).Hours() / 24))
+	dayDiff := int(math.Ceil(endDate.Sub(startDate).Hours()/24)) + 1
 	if err != nil {
 		return "", err
 	}
