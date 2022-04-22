@@ -11,7 +11,19 @@
 //
 package main
 
-import "sifrank/sched"
+import (
+	"sifrank/sched"
+
+	"github.com/sirupsen/logrus"
+	easy "github.com/t-tomalak/logrus-easy-formatter"
+)
+
+func init() {
+	logrus.SetFormatter(&easy.Formatter{
+		TimestampFormat: "2006-01-02 15:04:05",
+		LogFormat:       "[%time%][%lvl%]: %msg% \n",
+	})
+}
 
 func main() {
 	go sched.FetchNtpData()
