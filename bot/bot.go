@@ -12,7 +12,6 @@
 package bot
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -23,14 +22,14 @@ import (
 	"path/filepath"
 	"sifrank/cmd"
 	"sifrank/config"
+	"sifrank/consts"
 	"sifrank/db"
-	"sifrank/model"
+	"sifrank/tools"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/beevik/ntp"
-	"github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/driver"
@@ -62,7 +61,6 @@ type ItemData struct {
 }
 
 var (
-	ctx     = context.Background()
 	limiter = rate.NewManager[int64](time.Second*5, 1)
 )
 
@@ -87,39 +85,37 @@ func init() {
 
 	rankRule := zero.FullMatchRule("档线", "dx")
 	engine.OnMessage(rankRule).SetBlock(true).SetPriority(10).
-		Handle(func(context *zero.Ctx) {
+		Handle(func(ctx *zero.Ctx) {
 			now := time.Now()
 			ed, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.EndTime, time.Local)
-			eds := ed.Format("2006-01-02")
+			eds := ed.Format("20060102")
 			if err != nil {
 				logrus.Warn(err.Error())
 				return
 			}
 			if now.After(ed) {
-				var dk []model.DayRankData
-				err = db.MysqlClient.Select(&dk, "SELECT * FROM day_rank_data WHERE data_date = ? ORDER BY rank ASC", eds)
-				if err != nil {
-					logrus.Warn(err.Error())
-					return
-				}
-				msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: 已结束\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s\n========================\n回复 dq/当期档线/本期档线 可查看每日档线数据", config.Conf.AppName, config.Conf.EventName, strconv.Itoa(dk[0].Score), strconv.Itoa(dk[1].Score), strconv.Itoa(dk[2].Score))
-				context.Send(message.Text(msg))
+				list := db.LevelDb.ListPrefix([]byte(eds))
+				r1 := list[eds+"_ranking_1"]
+				r2 := list[eds+"_ranking_2"]
+				r3 := list[eds+"_ranking_3"]
+				msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: 已结束\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s\n========================\n回复 dq/当期档线/本期档线 可查看每日档线数据", config.Conf.AppName, config.Conf.EventName, r1, r2, r3)
+				ctx.Send(message.Text(msg))
 				return
 			}
 			result, err := GetData()
 			if err != nil || len(result) != 3 {
 				logrus.Warn(err)
 				dir, _ := os.Getwd()
-				context.Send("【" + config.Conf.AppName + "】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=" + config.Conf.AdminUser + "]")
+				ctx.Send("【" + config.Conf.AppName + "】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=" + config.Conf.AdminUser + "]")
 				return
 			}
 			msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: %s\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s\n========================\n回复 dq/当期档线/本期档线 可查看每日档线数据", config.Conf.AppName, config.Conf.EventName, GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
-			context.Send(message.Text(msg))
+			ctx.Send(message.Text(msg))
 		})
 
 	dayRankRule := zero.PrefixRule("当期", "当期档线", "本期档线", "dq")
 	engine.OnMessage(dayRankRule).SetBlock(true).SetPriority(1).
-		Handle(func(context *zero.Ctx) {
+		Handle(func(ctx *zero.Ctx) {
 			savePath, err := cmd.GenDayRankPic()
 			if err != nil {
 				logrus.Warn(err.Error())
@@ -127,35 +123,49 @@ func init() {
 			}
 
 			dir, _ := os.Getwd()
-			context.Send("[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, savePath)) + "]")
+			ctx.Send("[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, savePath)) + "]")
+		})
+
+	engine.OnCommand("migrate", zero.AdminPermission).SetBlock(true).SetPriority(1).
+		Handle(func(ctx *zero.Ctx) {
+			tools.MigrateFromMySQLToLevelDB()
+		})
+
+	engine.OnCommand("list", zero.AdminPermission).SetBlock(true).SetPriority(1).
+		Handle(func(ctx *zero.Ctx) {
+			list := db.LevelDb.List()
+			for k, v := range list {
+				fmt.Println(string(k) + " - " + string(v))
+			}
 		})
 }
 
 func GetData() (map[string]string, error) {
 	ret := make(map[string]string)
-	result, err := db.RedisClient.HGetAll(ctx, "request_header").Result()
-	if err != nil {
-		logrus.Warn("No request header: ", err.Error())
-		return map[string]string{}, err
-	}
-	for k, v := range result {
-		requestData, err := db.RedisClient.HGet(ctx, "request_data", k).Result()
-		if err == redis.Nil {
-			logrus.Warn("No request data for", k)
-			continue
-		} else if err != nil {
-			logrus.Warn("No request data: ", err.Error())
+	for _, v := range consts.RankType {
+		data_prefix := "request_data_"
+		data_key := []byte(data_prefix + v)
+		requestData, err := db.LevelDb.Get(data_key)
+		if err != nil {
+			logrus.Warn(err.Error())
 			continue
 		}
-		form := url.Values{"request_data": {requestData}}
+		form := url.Values{"request_data": {string(requestData)}}
 		requestUrl := "http://prod.game1.ll.sdo.com/main.php/ranking/eventPlayer"
 		req, err := http.NewRequest("POST", requestUrl, strings.NewReader(form.Encode()))
 		if err != nil {
 			logrus.Warn("Send request error: ", err.Error())
 			continue
 		}
+		header_prefix := "request_header_"
+		header_key := []byte(header_prefix + v)
+		requestHeader, err := db.LevelDb.Get(header_key)
+		if err != nil {
+			logrus.Warn(err.Error())
+			continue
+		}
 		headers := make(map[string]string)
-		err = json.Unmarshal([]byte(v), &headers)
+		err = json.Unmarshal(requestHeader, &headers)
 		if err != nil {
 			logrus.Warn("Unmarshal failed: ", err.Error())
 			continue
@@ -181,10 +191,10 @@ func GetData() (map[string]string, error) {
 		items := res.ResponseData.Items
 		itemLen := len(items)
 		if itemLen == 0 {
-			ret[k] = "暂无数据"
+			ret[v] = "暂无数据"
 		} else {
 			result := items[itemLen-1]
-			ret[k] = strconv.Itoa(result.Score)
+			ret[v] = strconv.Itoa(result.Score)
 		}
 
 		_ = resp.Body.Close()

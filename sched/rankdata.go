@@ -14,9 +14,7 @@ package sched
 import (
 	"sifrank/bot"
 	"sifrank/config"
-	"sifrank/consts"
 	"sifrank/db"
-	"sifrank/model"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -58,30 +56,13 @@ func FetchRankData() {
 					return
 				}
 				for k, v := range result {
-					dt := time.Now().Local().Format("2006-01-02")
-					ts := time.Now().Local().Format("2006-01-02 15:04:05")
-					var data []model.DayRankData
-					err := db.MysqlClient.Select(&data, "SELECT * FROM day_rank_data WHERE rank = ? AND data_date = ?", k, dt)
+					prefix := time.Now().Local().Format("20060102")
+					key := []byte(prefix + "_" + k)
+					value := []byte(v)
+					err = db.LevelDb.Put(key, value)
 					if err != nil {
-						logrus.Warn("Select SQL failed. ", err.Error())
-						continue
-					}
-					if len(data) > 0 {
-						ret, err := db.MysqlClient.Exec("UPDATE day_rank_data SET score = ?, data_time = ? WHERE id = ?", v, ts, data[0].Id)
-						if err != nil {
-							logrus.Warn("Update SQL failed. ", err.Error())
-							continue
-						}
-						row, _ := ret.RowsAffected()
-						logrus.Info("Update successfully. Rows affected: ", row)
-					} else {
-						ret, err := db.MysqlClient.Exec("INSERT INTO day_rank_data (rank, rank_code, score, data_date, data_time) VALUES (?, ?, ?, ?, ?)", k, consts.RankCode[k], v, dt, ts)
-						if err != nil {
-							logrus.Warn("Insert SQL failed. ", err.Error())
-							continue
-						}
-						id, _ := ret.LastInsertId()
-						logrus.Info("Insert successfully. Id: ", id)
+						logrus.Warn(err.Error())
+						break
 					}
 				}
 			}

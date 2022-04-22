@@ -14,7 +14,6 @@ package sched
 
 import (
 	"bufio"
-	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -32,7 +31,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var ctx = context.Background()
 var ranking = ""
 
 // Build a simple HTTP request parser using tcpassembly.StreamFactory and tcpassembly.Stream interfaces
@@ -86,7 +84,7 @@ func (h *httpStream) run() {
 			req.Header.Del("Accept")
 			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 			req.Header.Set("User-Agent", "Mozilla/5.0 (Linux; Android 11; ONE E1001 Build/RQ1A.210105.003) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/87.0.4280.101 Mobile Safari/537.36")
-			// Save headers to Redis
+			// Save headers to LevelDB
 			headers := make(map[string]string)
 			for k, v := range req.Header {
 				headers[k] = v[0]
@@ -100,15 +98,15 @@ func (h *httpStream) run() {
 			if ranking == "" {
 				continue
 			}
-			requestHeader := map[string]interface{}{
-				ranking: string(m),
-			}
-			err = db.RedisClient.HSet(ctx, "request_header", requestHeader).Err()
+			prefix := "request_header_"
+			key := []byte(prefix + ranking)
+			value := m
+			err = db.LevelDb.Put(key, value)
 			if err != nil {
-				logrus.Warn("Failed to save json to Redis: ", err.Error())
+				logrus.Warn(err.Error())
 				continue
 			}
-			logrus.Info("Success!")
+			logrus.Info("Put ", string(key), " success!")
 		}
 	}
 }
@@ -176,14 +174,15 @@ func FetchPacketData() {
 				if ranking == "" {
 					continue
 				}
-				requestData := map[string]interface{}{
-					ranking: strings.TrimRight(v, "\r"),
-				}
-				err = db.RedisClient.HSet(ctx, "request_data", requestData).Err()
+				prefix := "request_data_"
+				key := []byte(prefix + ranking)
+				value := []byte(strings.TrimRight(v, "\r"))
+				err = db.LevelDb.Put(key, value)
 				if err != nil {
-					logrus.Warn("Failed to save json to Redis: ", err.Error())
+					logrus.Warn(err.Error())
 					continue
 				}
+				logrus.Info("Put ", string(key), " success!")
 			}
 			assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packet.Metadata().Timestamp)
 		case <-ticker:

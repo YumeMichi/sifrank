@@ -15,7 +15,6 @@ import (
 	"math"
 	"sifrank/config"
 	"sifrank/db"
-	"sifrank/model"
 	"sifrank/utils"
 	"strconv"
 	"time"
@@ -77,21 +76,20 @@ func GenDayRankPic() (string, error) {
 	}
 	for i := 1; i <= dayDiff; i++ {
 		timeDiff, _ := time.ParseDuration(strconv.Itoa(24*(i-1)) + "h")
-		rankDate := startDate.Add(timeDiff).Format("2006-01-02")
-		var dayRanks []model.DayRankData
-		err := db.MysqlClient.Select(&dayRanks, "SELECT * FROM day_rank_data WHERE data_date = ? ORDER BY rank ASC", rankDate)
-		if err != nil {
-			return "", err
-		}
-		if len(dayRanks) == 0 {
+		rankDate := startDate.Add(timeDiff).Format("20060102")
+		list := db.LevelDb.ListPrefix([]byte(rankDate))
+		if len(list) == 0 {
 			break
 		}
+		r1 := list[rankDate+"_ranking_1"]
+		r2 := list[rankDate+"_ranking_2"]
+		r3 := list[rankDate+"_ranking_3"]
 		if i == dayDiff {
 			dc.SetRGB(1, 0, 0)
 		}
-		dc.DrawString(strconv.Itoa(dayRanks[0].Score), float64(x_offset+x_step*i+x_extra*i), float64(y_offset))
-		dc.DrawString(strconv.Itoa(dayRanks[1].Score), float64(x_offset+x_step*i+x_extra*i), float64(y_offset+y_step*1))
-		dc.DrawString(strconv.Itoa(dayRanks[2].Score), float64(x_offset+x_step*i+x_extra*i), float64(y_offset+y_step*2))
+		dc.DrawString(r1, float64(x_offset+x_step*i+x_extra*i), float64(y_offset))
+		dc.DrawString(r2, float64(x_offset+x_step*i+x_extra*i), float64(y_offset+y_step*1))
+		dc.DrawString(r3, float64(x_offset+x_step*i+x_extra*i), float64(y_offset+y_step*2))
 	}
 	err = dc.SavePNG(savePath)
 	return savePath, err

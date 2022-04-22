@@ -20,6 +20,7 @@ mysql_port: "3306"
 mysql_user: "root"
 mysql_password: "123456"
 mysql_db: "sifrank"
+leveldb_path: "/data/leveldb/sifrank.db"
 app_name: LoveLive! 国服档线小助手
 event_name: "μ's 的文化节"
 start_time: "2022-04-14 15:00:00"

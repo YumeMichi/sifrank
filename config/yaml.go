@@ -41,6 +41,7 @@ type YamlConfigs struct {
 	MysqlUser         string   `yaml:"mysql_user"`
 	MysqlPassword     string   `yaml:"mysql_password"`
 	MysqlDb           string   `yaml:"mysql_db"`
+	LevelDbPath       string   `yaml:"leveldb_path"`
 	AppName           string   `yaml:"app_name"`
 	EventName         string   `yaml:"event_name"`
 	StartTime         string   `yaml:"start_time"`
@@ -83,6 +84,7 @@ func DefaultConfigs() *YamlConfigs {
 		MysqlUser:         "root",
 		MysqlPassword:     "",
 		MysqlDb:           "sifrank",
+		LevelDbPath:       "./sifrank.db",
 		AppName:           "LoveLive! 国服档线小助手",
 		EventName:         "",
 		StartTime:         "",
