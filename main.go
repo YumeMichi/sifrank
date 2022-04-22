@@ -128,14 +128,14 @@ func (h *httpStream) run() {
 }
 
 func init() {
-	zero.RunAndBlock(zero.Config{
+	zero.Run(zero.Config{
 		NickName:      config.Conf.NickName,
 		CommandPrefix: "/",
 		SuperUsers:    config.Conf.SuperUsers,
 		Driver: []zero.Driver{
 			driver.NewWebSocketClient(fmt.Sprintf("ws://%s:%s", config.Conf.CqhttpHost, config.Conf.CqhttpPort), config.Conf.AccessToken),
 		},
-	}, nil)
+	})
 
 	logrus.SetFormatter(&easy.Formatter{
 		TimestampFormat: "2006-01-02 15:04:05",

@@ -27,7 +27,7 @@ type YamlConfigs struct {
 	Snaplen           int      `yaml:"snaplen"`
 	Filter            string   `yaml:"filter"`
 	NickName          []string `yaml:"nickname"`
-	SuperUsers        []int64  `yaml:"super_users"`
+	SuperUsers        []string `yaml:"super_users"`
 	AdminUser         string   `yaml:"admin_user"`
 	CqhttpHost        string   `yaml:"cqhttp_host"`
 	CqhttpPort        string   `yaml:"cqhttp_port"`
@@ -69,7 +69,7 @@ func DefaultConfigs() *YamlConfigs {
 		Snaplen:           1600,
 		Filter:            "tcp and port 80",
 		NickName:          []string{"YumeMichi"},
-		SuperUsers:        []int64{785569962, 1157490807},
+		SuperUsers:        []string{"785569962", "1157490807"},
 		AdminUser:         "1157490807",
 		CqhttpHost:        "127.0.0.1",
 		CqhttpPort:        "6700",
