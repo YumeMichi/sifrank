@@ -21,7 +21,7 @@ import (
 
 var MysqlClient *sqlx.DB
 
-func init() {
+func InitMySQL() {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", config.Conf.MysqlUser, config.Conf.MysqlPassword, config.Conf.MysqlHost, config.Conf.MysqlPort, config.Conf.MysqlDb)
 	client, err := sqlx.Open("mysql", dsn)
 	if err != nil {

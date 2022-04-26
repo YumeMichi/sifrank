@@ -11,14 +11,15 @@ admin_user: "1157490807"
 cqhttp_host: 127.0.0.1
 cqhttp_port: "6700"
 access_token: "klab"
+enable_migration: false
 redis_host: 127.0.0.1
 redis_port: "6379"
-redis_password: "xcwl@501"
+redis_password: ""
 redis_db: 0
 mysql_host: 127.0.0.1
 mysql_port: "3306"
 mysql_user: "root"
-mysql_password: "123456"
+mysql_password: ""
 mysql_db: "sifrank"
 leveldb_path: "/data/leveldb/sifrank.db"
 app_name: LoveLive! 国服档线小助手
@@ -30,7 +31,7 @@ dq_x_step: 160
 dq_x_extra: 14
 dq_y_offset: 178
 dq_y_step: 46
-dq_title: "国服 第38次 Challenge Festival 《μ's 的文化节》\t果/凛绘\t04.14-04.24"
+dq_title: "国服 第28次 Challenge Festival 《μ's 的文化节》\t果/凛绘\t04.14-04.24"
 dq_subtitle: ""
 dq_font_name: "./assets/fonts/simsun.ttc"
 dq_font_size: 32

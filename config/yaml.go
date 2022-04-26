@@ -32,6 +32,7 @@ type YamlConfigs struct {
 	CqhttpHost        string   `yaml:"cqhttp_host"`
 	CqhttpPort        string   `yaml:"cqhttp_port"`
 	AccessToken       string   `yaml:"access_token"`
+	EnableMigration   bool     `yaml:"enable_migration"`
 	RedisHost         string   `yaml:"redis_host"`
 	RedisPort         string   `yaml:"redis_port"`
 	RedisPassword     string   `yaml:"redis_password"`
@@ -75,6 +76,7 @@ func DefaultConfigs() *YamlConfigs {
 		CqhttpHost:        "127.0.0.1",
 		CqhttpPort:        "6700",
 		AccessToken:       "",
+		EnableMigration:   false,
 		RedisHost:         "127.0.0.1",
 		RedisPort:         "6379",
 		RedisPassword:     "",
