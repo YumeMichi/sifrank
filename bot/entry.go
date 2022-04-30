@@ -24,7 +24,7 @@ var (
 	keywords []string
 )
 
-func init() {
+func InitKeywordEntry() {
 	err := loadKeywords()
 	if err != nil {
 		return
