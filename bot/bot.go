@@ -98,7 +98,8 @@ func init() {
 				r1 := list[eds+"_ranking_1"]
 				r2 := list[eds+"_ranking_2"]
 				r3 := list[eds+"_ranking_3"]
-				msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: 已结束\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s\n========================\n回复 dq/当期档线/本期档线 可查看每日档线数据", config.Conf.AppName, config.Conf.EventName, r1, r2, r3)
+				// msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: 已结束\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s\n========================\n回复 dq/当期档线/本期档线 可查看每日档线数据", config.Conf.AppName, config.Conf.EventName, r1, r2, r3)
+				msg := fmt.Sprintf("一档点数: %s\n二档点数: %s\n三档点数: %s\n剩余时间: 已结束", r1, r2, r3)
 				ctx.Send(message.Text(msg))
 				return
 			}
@@ -109,7 +110,8 @@ func init() {
 				ctx.Send("【" + config.Conf.AppName + "】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=" + config.Conf.AdminUser + "]")
 				return
 			}
-			msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: %s\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s\n========================\n回复 dq/当期档线/本期档线 可查看每日档线数据", config.Conf.AppName, config.Conf.EventName, GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
+			// msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: %s\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s\n========================\n回复 dq/当期档线/本期档线 可查看每日档线数据", config.Conf.AppName, config.Conf.EventName, GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
+			msg := fmt.Sprintf("一档点数: %s\n二档点数: %s\n三档点数: %s\n剩余时间: %s", result["ranking_1"], result["ranking_2"], result["ranking_3"], GetETA())
 			ctx.Send(message.Text(msg))
 		})
 
