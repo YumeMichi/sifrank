@@ -13,6 +13,7 @@ package bot
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"math"
@@ -107,7 +108,7 @@ func init() {
 			if err != nil || len(result) != 3 {
 				logrus.Warn(err)
 				dir, _ := os.Getwd()
-				ctx.Send("【" + config.Conf.AppName + "】\n数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=" + config.Conf.AdminUser + "]")
+				ctx.Send("数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=" + config.Conf.AdminUser + "]")
 				return
 			}
 			// msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: %s\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s\n========================\n回复 dq/当期档线/本期档线 可查看每日档线数据", config.Conf.AppName, config.Conf.EventName, GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
@@ -149,28 +150,24 @@ func GetData() (map[string]string, error) {
 		data_key := []byte(data_prefix + v)
 		requestData, err := db.LevelDb.Get(data_key)
 		if err != nil {
-			logrus.Warn(err.Error())
-			continue
+			return ret, err
 		}
 		form := url.Values{"request_data": {string(requestData)}}
 		requestUrl := "http://prod.game1.ll.sdo.com/main.php/ranking/eventPlayer"
 		req, err := http.NewRequest("POST", requestUrl, strings.NewReader(form.Encode()))
 		if err != nil {
-			logrus.Warn("Send request error: ", err.Error())
-			continue
+			return ret, errors.New("Send request error: " + err.Error())
 		}
 		header_prefix := "request_header_"
 		header_key := []byte(header_prefix + v)
 		requestHeader, err := db.LevelDb.Get(header_key)
 		if err != nil {
-			logrus.Warn(err.Error())
-			continue
+			return ret, err
 		}
 		headers := make(map[string]string)
 		err = json.Unmarshal(requestHeader, &headers)
 		if err != nil {
-			logrus.Warn("Unmarshal failed: ", err.Error())
-			continue
+			return ret, errors.New("Unmarshal failed: " + err.Error())
 		}
 		for kk, vv := range headers {
 			req.Header.Add(kk, vv)
@@ -179,15 +176,17 @@ func GetData() (map[string]string, error) {
 		client := http.Client{Timeout: 5 * time.Second}
 		resp, err := client.Do(req)
 		if err != nil {
-			logrus.Warn("Send request failed: ", err.Error())
-			continue
+			return ret, errors.New("Send request failed: " + err.Error())
 		}
 		body, _ := ioutil.ReadAll(resp.Body)
 
 		var res = &Response{}
 		if err := json.Unmarshal(body, res); err != nil {
-			logrus.Warn("Unmarshal failed: ", err.Error())
-			continue
+			return ret, errors.New("Unmarshal failed: " + err.Error())
+		}
+
+		if res.ResponseData.TotalCount == 0 {
+			return ret, errors.New("No data")
 		}
 
 		items := res.ResponseData.Items
