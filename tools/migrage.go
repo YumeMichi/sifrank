@@ -15,17 +15,16 @@ import (
 	"fmt"
 	"sifrank/db"
 	"sifrank/model"
+	"sifrank/xclog"
 	"strconv"
 	"strings"
-
-	"github.com/sirupsen/logrus"
 )
 
 func MigrateFromMySQLToLevelDB() {
 	var data []model.DayRankData
 	err := db.MysqlClient.Select(&data, "SELECT * FROM day_rank_data")
 	if err != nil {
-		logrus.Warn(err.Error())
+		xclog.Warn(err.Error())
 		return
 	}
 
@@ -36,7 +35,7 @@ func MigrateFromMySQLToLevelDB() {
 		err = db.LevelDb.Put([]byte(key), []byte(value))
 		err = db.LevelDb.Put(key, value)
 		if err != nil {
-			logrus.Warn(err.Error())
+			xclog.Warn(err.Error())
 		}
 		fmt.Println("==== Put ", string(key), " ====")
 	}

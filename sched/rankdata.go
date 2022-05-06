@@ -15,9 +15,8 @@ import (
 	"sifrank/bot"
 	"sifrank/config"
 	"sifrank/db"
+	"sifrank/xclog"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 func FetchRankData() {
@@ -52,7 +51,7 @@ func FetchRankData() {
 			if h == hOffset && m == mOffset && s == sOffset {
 				result, err := bot.GetData()
 				if err != nil || len(result) != 3 {
-					logrus.Warn(err)
+					xclog.Warn(err)
 					return
 				}
 				for k, v := range result {
@@ -61,7 +60,7 @@ func FetchRankData() {
 					value := []byte(v)
 					err = db.LevelDb.Put(key, value)
 					if err != nil {
-						logrus.Warn(err.Error())
+						xclog.Warn(err.Error())
 						break
 					}
 				}

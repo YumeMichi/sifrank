@@ -3,10 +3,10 @@ package bot
 import (
 	"fmt"
 	"sifrank/db"
+	"sifrank/xclog"
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
@@ -51,7 +51,7 @@ func GetEntry() {
 			var entry []KeywordEntry
 			err := db.MysqlClient.Select(&entry, "SELECT * FROM `keyword_entry` WHERE `keyword` = ? AND `group` = ?", key, group)
 			if err != nil {
-				logrus.Warn(err.Error())
+				xclog.Warn(err.Error())
 				return
 			}
 			if len(entry) > 0 {
@@ -61,11 +61,11 @@ func GetEntry() {
 			dt := time.Now().Format("2006-01-02 15:04:05")
 			ret, err := db.MysqlClient.Exec("INSERT INTO `keyword_entry` (`keyword`, `content`, `sender`, `group`, `dt`) VALUES (?, ?, ?, ?, ?)", key, value, sender, group, dt)
 			if err != nil {
-				logrus.Warn(err.Error())
+				xclog.Warn(err.Error())
 				return
 			}
 			id, _ := ret.LastInsertId()
-			logrus.Debug("Insert successfully. Id: ", id)
+			xclog.Debug("Insert successfully. Id: ", id)
 			loadKeywords()
 			context.Send(cq.String() + "词条 " + key + " 添加成功！")
 		})
@@ -81,7 +81,7 @@ func GetEntry() {
 			var entry []KeywordEntry
 			err := db.MysqlClient.Select(&entry, "SELECT * FROM `keyword_entry` WHERE `keyword` LIKE ? AND `group` = ?", "%"+key+"%", group)
 			if err != nil {
-				logrus.Warn(err.Error())
+				xclog.Warn(err.Error())
 				return
 			}
 			fmt.Println(entry)
@@ -98,7 +98,7 @@ func loadKeywords() error {
 	for _, v := range entry {
 		keywords = append(keywords, v.Keyword)
 	}
-	logrus.Debug(keywords)
+	xclog.Debug(keywords)
 	reloadKeywordsSearch()
 	return nil
 }
@@ -113,7 +113,7 @@ func reloadKeywordsSearch() {
 			var entry []KeywordEntry
 			err := db.MysqlClient.Select(&entry, "SELECT * FROM `keyword_entry` WHERE `keyword` = ? AND `group` = ?", key, group)
 			if err != nil {
-				logrus.Warn(err.Error())
+				xclog.Warn(err.Error())
 				return
 			}
 			cq := message.At(context.Event.Sender.ID)

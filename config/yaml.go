@@ -14,58 +14,70 @@ package config
 import (
 	"os"
 	"sifrank/utils"
+	"sifrank/xclog"
 	"strconv"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
 
+type LogConfigs struct {
+	LogDir   string `yaml:"log_dir"`
+	LogLevel int    `yaml:"log_level"`
+	LogSave  bool   `yaml:"log_save"`
+}
+
 type YamlConfigs struct {
-	Iface             string   `yaml:"iface"`
-	Fname             string   `yaml:"fname"`
-	Snaplen           int      `yaml:"snaplen"`
-	Filter            string   `yaml:"filter"`
-	NickName          []string `yaml:"nickname"`
-	SuperUsers        []int64  `yaml:"super_users"`
-	AdminUser         string   `yaml:"admin_user"`
-	CqhttpHost        string   `yaml:"cqhttp_host"`
-	CqhttpPort        string   `yaml:"cqhttp_port"`
-	AccessToken       string   `yaml:"access_token"`
-	EnableMigration   bool     `yaml:"enable_migration"`
-	RedisHost         string   `yaml:"redis_host"`
-	RedisPort         string   `yaml:"redis_port"`
-	RedisPassword     string   `yaml:"redis_password"`
-	RedisDb           int      `yaml:"redis_db"`
-	MysqlHost         string   `yaml:"mysql_host"`
-	MysqlPort         string   `yaml:"mysql_port"`
-	MysqlUser         string   `yaml:"mysql_user"`
-	MysqlPassword     string   `yaml:"mysql_password"`
-	MysqlDb           string   `yaml:"mysql_db"`
-	LevelDbPath       string   `yaml:"leveldb_path"`
-	AppName           string   `yaml:"app_name"`
-	EventName         string   `yaml:"event_name"`
-	StartTime         string   `yaml:"start_time"`
-	EndTime           string   `yaml:"end_time"`
-	DqXOffset         int      `yaml:"dq_x_offset"`
-	DqXStep           int      `yaml:"dq_x_step"`
-	DqXExtra          int      `yaml:"dq_x_extra"`
-	DqYOffset         int      `yaml:"dq_y_offset"`
-	DqYStep           int      `yaml:"dq_y_step"`
-	DqTitle           string   `yaml:"dq_title"`
-	DqSubtitle        string   `yaml:"dq_subtitle"`
-	DqFontName        string   `yaml:"dq_font_name"`
-	DqFontSize        float64  `yaml:"dq_font_size"`
-	DqTitleXOffset    float64  `yaml:"dq_title_x_offset"`
-	DqTitleYOffset    float64  `yaml:"dq_title_y_offset"`
-	DqSubtitleXOffset float64  `yaml:"dq_subtitle_x_offset"`
-	DqSubtitleYOffset float64  `yaml:"dq_subtitle_y_offset"`
-	DqBaseImage       string   `yaml:"dq_base_image"`
-	DqOutputDir       string   `yaml:"dq_output_dir"`
+	Log               *LogConfigs `yaml:"log"`
+	Iface             string      `yaml:"iface"`
+	Fname             string      `yaml:"fname"`
+	Snaplen           int         `yaml:"snaplen"`
+	Filter            string      `yaml:"filter"`
+	NickName          []string    `yaml:"nickname"`
+	SuperUsers        []int64     `yaml:"super_users"`
+	AdminUser         string      `yaml:"admin_user"`
+	CqhttpHost        string      `yaml:"cqhttp_host"`
+	CqhttpPort        string      `yaml:"cqhttp_port"`
+	AccessToken       string      `yaml:"access_token"`
+	EnableMigration   bool        `yaml:"enable_migration"`
+	RedisHost         string      `yaml:"redis_host"`
+	RedisPort         string      `yaml:"redis_port"`
+	RedisPassword     string      `yaml:"redis_password"`
+	RedisDb           int         `yaml:"redis_db"`
+	MysqlHost         string      `yaml:"mysql_host"`
+	MysqlPort         string      `yaml:"mysql_port"`
+	MysqlUser         string      `yaml:"mysql_user"`
+	MysqlPassword     string      `yaml:"mysql_password"`
+	MysqlDb           string      `yaml:"mysql_db"`
+	LevelDbPath       string      `yaml:"leveldb_path"`
+	AppName           string      `yaml:"app_name"`
+	EventName         string      `yaml:"event_name"`
+	StartTime         string      `yaml:"start_time"`
+	EndTime           string      `yaml:"end_time"`
+	DqXOffset         int         `yaml:"dq_x_offset"`
+	DqXStep           int         `yaml:"dq_x_step"`
+	DqXExtra          int         `yaml:"dq_x_extra"`
+	DqYOffset         int         `yaml:"dq_y_offset"`
+	DqYStep           int         `yaml:"dq_y_step"`
+	DqTitle           string      `yaml:"dq_title"`
+	DqSubtitle        string      `yaml:"dq_subtitle"`
+	DqFontName        string      `yaml:"dq_font_name"`
+	DqFontSize        float64     `yaml:"dq_font_size"`
+	DqTitleXOffset    float64     `yaml:"dq_title_x_offset"`
+	DqTitleYOffset    float64     `yaml:"dq_title_y_offset"`
+	DqSubtitleXOffset float64     `yaml:"dq_subtitle_x_offset"`
+	DqSubtitleYOffset float64     `yaml:"dq_subtitle_y_offset"`
+	DqBaseImage       string      `yaml:"dq_base_image"`
+	DqOutputDir       string      `yaml:"dq_output_dir"`
 }
 
 func DefaultConfigs() *YamlConfigs {
 	return &YamlConfigs{
+		Log: &LogConfigs{
+			LogDir:   "logs",
+			LogLevel: 5,
+			LogSave:  true,
+		},
 		Iface:             "enp8s0",
 		Fname:             "",
 		Snaplen:           1600,
@@ -116,21 +128,21 @@ func Load(p string) *YamlConfigs {
 	c := YamlConfigs{}
 	err := yaml.Unmarshal([]byte(utils.ReadAllText(p)), &c)
 	if err != nil {
-		logrus.Error("[LLSIF] 尝试加载配置文件失败: 读取文件失败！")
-		logrus.Info("[LLSIF] 原配置文件已备份！")
+		xclog.Error("[LLSIF] 尝试加载配置文件失败: 读取文件失败！")
+		xclog.Info("[LLSIF] 原配置文件已备份！")
 		_ = os.Rename(p, p+".backup"+strconv.FormatInt(time.Now().Unix(), 10))
 		_ = DefaultConfigs().Save(p)
 	}
 	c = YamlConfigs{}
 	_ = yaml.Unmarshal([]byte(utils.ReadAllText(p)), &c)
-	logrus.Info("[LLSIF] 配置加载完毕！")
+	xclog.Info("[LLSIF] 配置加载完毕！")
 	return &c
 }
 
 func (c *YamlConfigs) Save(p string) error {
 	data, err := yaml.Marshal(c)
 	if err != nil {
-		logrus.Error("[LLSIF] 写入新的配置文件失败！")
+		xclog.Error("[LLSIF] 写入新的配置文件失败！")
 		return err
 	}
 	utils.WriteAllText(p, string(data))

@@ -14,9 +14,8 @@ package sched
 import (
 	"bytes"
 	"os/exec"
+	"sifrank/xclog"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 func FetchNtpData() {
@@ -31,10 +30,10 @@ func FetchNtpData() {
 			cmd.Stdout = &bytes.Buffer{}
 			err := cmd.Run()
 			if err != nil {
-				logrus.Warn(err.Error())
-				logrus.Warn(cmd.Stderr.(*bytes.Buffer).String())
+				xclog.Warn(err.Error())
+				xclog.Warn(cmd.Stderr.(*bytes.Buffer).String())
 			} else {
-				logrus.Info(cmd.Stdout.(*bytes.Buffer).String())
+				xclog.Info(cmd.Stdout.(*bytes.Buffer).String())
 			}
 		}
 	}

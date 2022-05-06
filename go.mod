@@ -9,12 +9,12 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/google/gopacket v1.1.19
 	github.com/jmoiron/sqlx v1.3.4
-	github.com/sirupsen/logrus v1.8.1
 	github.com/syndtr/goleveldb v1.0.0
-	github.com/t-tomalak/logrus-easy-formatter v0.0.0-20190827215021-c074f06c5816
 	github.com/wdvxdr1123/ZeroBot v1.5.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )
+
+require github.com/sirupsen/logrus v1.8.1 // indirect
 
 require (
 	github.com/RomiChan/websocket v1.4.3-0.20220123145318-307a86b127bc // indirect

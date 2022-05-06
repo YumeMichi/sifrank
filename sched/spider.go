@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"sifrank/config"
 	"sifrank/db"
+	"sifrank/xclog"
 	"strings"
 	"time"
 
@@ -28,7 +29,6 @@ import (
 	"github.com/google/gopacket/pcap"
 	"github.com/google/gopacket/tcpassembly"
 	"github.com/google/gopacket/tcpassembly/tcpreader"
-	"github.com/sirupsen/logrus"
 )
 
 var ranking = ""
@@ -64,7 +64,7 @@ func (h *httpStream) run() {
 			// We must read until we see an EOF... very important!
 			return
 		} else if err != nil {
-			// logrus.Warn("Error reading stream", h.net, h.transport, ":", err)
+			// xclog.Warn("Error reading stream", h.net, h.transport, ":", err)
 			continue
 		} else {
 			if req == nil {
@@ -91,10 +91,10 @@ func (h *httpStream) run() {
 			}
 			m, err := json.Marshal(headers)
 			if err != nil {
-				logrus.Warn("Failed to marshal headers into json: ", err.Error())
+				xclog.Warn("Failed to marshal headers into json: ", err.Error())
 				continue
 			}
-			logrus.Info(string(m))
+			xclog.Info(string(m))
 			if ranking == "" {
 				continue
 			}
@@ -103,10 +103,10 @@ func (h *httpStream) run() {
 			value := m
 			err = db.LevelDb.Put(key, value)
 			if err != nil {
-				logrus.Warn(err.Error())
+				xclog.Warn(err.Error())
 				continue
 			}
-			logrus.Info("Put ", string(key), " success!")
+			xclog.Info("Put ", string(key), " success!")
 		}
 	}
 }
@@ -118,19 +118,19 @@ func FetchPacketData() {
 
 	// Set up pcap packet capture
 	if config.Conf.Fname != "" {
-		logrus.Infof("Reading from pcap dump %s", config.Conf.Fname)
+		xclog.Infof("Reading from pcap dump %s", config.Conf.Fname)
 		handle, err = pcap.OpenOffline(config.Conf.Fname)
 	} else {
-		logrus.Infof("Starting capture on interface %s", config.Conf.Iface)
+		xclog.Infof("Starting capture on interface %s", config.Conf.Iface)
 		handle, err = pcap.OpenLive(config.Conf.Iface, int32(config.Conf.Snaplen), true, pcap.BlockForever)
 	}
 	if err != nil {
-		logrus.Error(err)
+		xclog.Error(err)
 		return
 	}
 
 	if err := handle.SetBPFFilter(config.Conf.Filter); err != nil {
-		logrus.Error(err)
+		xclog.Error(err)
 		return
 	}
 
@@ -140,7 +140,7 @@ func FetchPacketData() {
 	assembler := tcpassembly.NewAssembler(streamPool)
 
 	// Read in packets, pass to assembler.
-	logrus.Info("Reading in packets")
+	xclog.Info("Reading in packets")
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	packets := packetSource.Packets()
 	ticker := time.Tick(time.Minute)
@@ -152,7 +152,7 @@ func FetchPacketData() {
 				return
 			}
 			if packet.NetworkLayer() == nil || packet.TransportLayer() == nil || packet.TransportLayer().LayerType() != layers.LayerTypeTCP {
-				logrus.Info("Unusable packet")
+				xclog.Info("Unusable packet")
 				continue
 			}
 			tcp := packet.TransportLayer().(*layers.TCP)
@@ -179,10 +179,10 @@ func FetchPacketData() {
 				value := []byte(strings.TrimRight(v, "\r"))
 				err = db.LevelDb.Put(key, value)
 				if err != nil {
-					logrus.Warn(err.Error())
+					xclog.Warn(err.Error())
 					continue
 				}
-				logrus.Info("Put ", string(key), " success!")
+				xclog.Info("Put ", string(key), " success!")
 			}
 			assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packet.Metadata().Timestamp)
 		case <-ticker:

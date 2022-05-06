@@ -1,3 +1,7 @@
+log:
+    log_dir: logs
+    log_level: 5
+    log_save: true
 iface: enp8s0
 fname: ""
 snaplen: 1600

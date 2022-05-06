@@ -26,12 +26,12 @@ import (
 	"sifrank/consts"
 	"sifrank/db"
 	"sifrank/tools"
+	"sifrank/xclog"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/beevik/ntp"
-	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/driver"
 	"github.com/wdvxdr1123/ZeroBot/extension/rate"
@@ -91,7 +91,7 @@ func init() {
 			ed, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.EndTime, time.Local)
 			eds := ed.Format("20060102")
 			if err != nil {
-				logrus.Warn(err.Error())
+				xclog.Warn(err.Error())
 				return
 			}
 			if now.After(ed) {
@@ -106,7 +106,7 @@ func init() {
 			}
 			result, err := GetData()
 			if err != nil || len(result) != 3 {
-				logrus.Warn(err)
+				xclog.Warn(err)
 				dir, _ := os.Getwd()
 				ctx.Send("数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=" + config.Conf.AdminUser + "]")
 				return
@@ -121,7 +121,7 @@ func init() {
 		Handle(func(ctx *zero.Ctx) {
 			savePath, err := cmd.GenDayRankPic()
 			if err != nil {
-				logrus.Warn(err.Error())
+				xclog.Warn(err.Error())
 				return
 			}
 
@@ -208,7 +208,7 @@ func GetData() (map[string]string, error) {
 func GetETA() string {
 	now, err := ntp.Time("ntp.aliyun.com")
 	if err != nil {
-		logrus.Warn("NTP error, now using local time.")
+		xclog.Warn("NTP error, now using local time.")
 		now = time.Now().Local()
 	}
 	end, _ := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.EndTime, time.Local)

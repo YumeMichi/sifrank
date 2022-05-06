@@ -2,14 +2,14 @@ package cmd
 
 import (
 	"sifrank/db"
+	"sifrank/xclog"
 
-	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
 func init() {
 	if len(GetKeywordList().Array()) == 0 {
-		logrus.Warn("No keyword data")
+		xclog.Warn("No keyword data")
 	}
 }
 

@@ -15,21 +15,16 @@ import (
 	"sifrank/config"
 	"sifrank/db"
 	"sifrank/sched"
-
-	"github.com/sirupsen/logrus"
-	easy "github.com/t-tomalak/logrus-easy-formatter"
+	"sifrank/xclog"
 )
 
 func init() {
-	logrus.SetFormatter(&easy.Formatter{
-		TimestampFormat: "2006-01-02 15:04:05",
-		LogFormat:       "[%time%][%lvl%]: %msg% \n",
-	})
-
 	if config.Conf.EnableMigration {
 		db.InitMySQL()
 		db.InitRedis()
 	}
+
+	xclog.Init(config.Conf.Log.LogDir, "", config.Conf.Log.LogLevel, config.Conf.Log.LogSave)
 }
 
 func main() {
