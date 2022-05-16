@@ -116,7 +116,7 @@ func init() {
 			ctx.Send(message.Text(msg))
 		})
 
-	dayRankRule := zero.PrefixRule("当期", "当期档线", "本期档线", "dq")
+	dayRankRule := zero.PrefixRule("当期1", "当期档线1", "本期档线1", "dq1")
 	engine.OnMessage(dayRankRule).SetBlock(true).SetPriority(1).
 		Handle(func(ctx *zero.Ctx) {
 			savePath, err := cmd.GenDayRankPic()
@@ -138,7 +138,7 @@ func init() {
 		Handle(func(ctx *zero.Ctx) {
 			list := db.LevelDb.List()
 			for k, v := range list {
-				fmt.Println(string(k) + " - " + string(v))
+				xclog.Debug(string(k) + " - " + string(v))
 			}
 		})
 }
@@ -183,10 +183,6 @@ func GetData() (map[string]string, error) {
 		var res = &Response{}
 		if err := json.Unmarshal(body, res); err != nil {
 			return ret, errors.New("Unmarshal failed: " + err.Error())
-		}
-
-		if res.ResponseData.TotalCount == 0 {
-			return ret, errors.New("No data")
 		}
 
 		items := res.ResponseData.Items

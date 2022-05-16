@@ -27,15 +27,15 @@ mysql_password: ""
 mysql_db: "sifrank"
 leveldb_path: "/data/leveldb/sifrank.db"
 app_name: LoveLive! 国服档线小助手
-event_name: "咱们去采橘子吧"
-start_time: "2022-04-29 15:00:00"
-end_time: "2022-05-10 14:00:00"
+event_name: "闪耀吧！全国大会"
+start_time: "2022-05-16 15:00:00"
+end_time: "2022-05-26 14:00:00"
 dq_x_offset: 62
 dq_x_step: 160
 dq_x_extra: 14
 dq_y_offset: 178
 dq_y_step: 46
-dq_title: "国服 第22次 友情大合战 《咱们去采橘子吧》\t南/曜黛\t04.29-05.10"
+dq_title: "国服 第26次 Medley Festival 《闪耀吧！全国大会》\t姬/花果\t05.16-05.26"
 dq_subtitle: ""
 dq_font_name: "./assets/fonts/simsun.ttc"
 dq_font_size: 32

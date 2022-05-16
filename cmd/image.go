@@ -15,6 +15,7 @@ import (
 	"math"
 	"sifrank/config"
 	"sifrank/db"
+	"sifrank/xclog"
 	"sifrank/utils"
 	"strconv"
 	"time"
@@ -78,6 +79,7 @@ func GenDayRankPic() (string, error) {
 		timeDiff, _ := time.ParseDuration(strconv.Itoa(24*(i-1)) + "h")
 		rankDate := startDate.Add(timeDiff).Format("20060102")
 		list := db.LevelDb.ListPrefix([]byte(rankDate))
+		xclog.Debug(rankDate)
 		if len(list) == 0 {
 			break
 		}
