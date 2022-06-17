@@ -1,3 +1,8 @@
+//
+// Copyright (C) 2022 YumeMichi
+//
+// SPDX-License-Identifier: Apache-2.0
+//
 package xclog
 
 import (
