@@ -16,7 +16,8 @@ import (
 var MysqlClient *sqlx.DB
 
 func InitMySQL() {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", config.Conf.MysqlUser, config.Conf.MysqlPassword, config.Conf.MysqlHost, config.Conf.MysqlPort, config.Conf.MysqlDb)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", config.Conf.Mysql.MysqlUser, config.Conf.Mysql.MysqlPassword,
+		config.Conf.Mysql.MysqlHost, config.Conf.Mysql.MysqlPort, config.Conf.Mysql.MysqlDb)
 	client, err := sqlx.Open("mysql", dsn)
 	if err != nil {
 		panic(err.Error())

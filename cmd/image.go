@@ -18,19 +18,19 @@ import (
 )
 
 var (
-	x_offset = config.Conf.DqXOffset
-	x_step   = config.Conf.DqXStep
-	x_extra  = config.Conf.DqXExtra
-	y_offset = config.Conf.DqYOffset
-	y_step   = config.Conf.DqYStep
+	x_offset = config.Conf.Dq.DqXOffset
+	x_step   = config.Conf.Dq.DqXStep
+	x_extra  = config.Conf.Dq.DqXExtra
+	y_offset = config.Conf.Dq.DqYOffset
+	y_step   = config.Conf.Dq.DqYStep
 )
 
 func GenDayRankPic() (string, error) {
-	startDate, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.StartTime, time.Local)
+	startDate, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.Event.StartTime, time.Local)
 	if err != nil {
 		return "", err
 	}
-	endDate, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.EndTime, time.Local)
+	endDate, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.Event.EndTime, time.Local)
 	if err != nil {
 		return "", err
 	}
@@ -40,24 +40,24 @@ func GenDayRankPic() (string, error) {
 	if isEnd {
 		fileName = now
 	}
-	savePath := config.Conf.DqOutputDir + "/" + fileName + ".png"
-	if !isEnd && utils.PathExists(config.Conf.DqOutputDir+"/"+fileName+".png") {
+	savePath := config.Conf.Dq.DqOutputDir + "/" + fileName + ".png"
+	if !isEnd && utils.PathExists(config.Conf.Dq.DqOutputDir+"/"+fileName+".png") {
 		return savePath, nil
 	}
-	img, err := gg.LoadImage(config.Conf.DqBaseImage)
+	img, err := gg.LoadImage(config.Conf.Dq.DqBaseImage)
 	if err != nil {
 		return "", err
 	}
 	dc := gg.NewContextForImage(img)
 	dc.SetRGB(0, 0, 0)
-	if err := dc.LoadFontFace(config.Conf.DqFontName, config.Conf.DqFontSize); err != nil {
+	if err := dc.LoadFontFace(config.Conf.Dq.DqFontName, config.Conf.Dq.DqFontSize); err != nil {
 		return "", err
 	}
 	// 档线大标题
-	dc.DrawString(config.Conf.DqTitle, config.Conf.DqTitleXOffset, config.Conf.DqTitleYOffset)
-	if config.Conf.DqSubtitle != "" {
+	dc.DrawString(config.Conf.Dq.DqTitle, config.Conf.Dq.DqTitleXOffset, config.Conf.Dq.DqTitleYOffset)
+	if config.Conf.Dq.DqSubtitle != "" {
 		dc.SetRGB(1, 0, 0)
-		dc.DrawString(config.Conf.DqSubtitle, config.Conf.DqSubtitleXOffset, config.Conf.DqSubtitleYOffset)
+		dc.DrawString(config.Conf.Dq.DqSubtitle, config.Conf.Dq.DqSubtitleXOffset, config.Conf.Dq.DqSubtitleYOffset)
 		dc.SetRGB(0, 0, 0)
 	}
 	// 档线小标题

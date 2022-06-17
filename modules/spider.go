@@ -111,19 +111,19 @@ func FetchPacketData() {
 	var err error
 
 	// Set up pcap packet capture
-	if config.Conf.Fname != "" {
-		xclog.Infof("Reading from pcap dump %s", config.Conf.Fname)
-		handle, err = pcap.OpenOffline(config.Conf.Fname)
+	if config.Conf.Pcap.Fname != "" {
+		xclog.Infof("Reading from pcap dump %s", config.Conf.Pcap.Fname)
+		handle, err = pcap.OpenOffline(config.Conf.Pcap.Fname)
 	} else {
-		xclog.Infof("Starting capture on interface %s", config.Conf.Iface)
-		handle, err = pcap.OpenLive(config.Conf.Iface, int32(config.Conf.Snaplen), true, pcap.BlockForever)
+		xclog.Infof("Starting capture on interface %s", config.Conf.Pcap.Iface)
+		handle, err = pcap.OpenLive(config.Conf.Pcap.Iface, int32(config.Conf.Pcap.Snaplen), true, pcap.BlockForever)
 	}
 	if err != nil {
 		xclog.Error(err)
 		return
 	}
 
-	if err := handle.SetBPFFilter(config.Conf.Filter); err != nil {
+	if err := handle.SetBPFFilter(config.Conf.Pcap.Filter); err != nil {
 		xclog.Error(err)
 		return
 	}

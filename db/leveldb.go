@@ -27,7 +27,7 @@ func init() {
 }
 
 func (ldb *LevelDbImpl) InitDb() {
-	ldb.ldb, err = leveldb.OpenFile(config.Conf.LevelDbPath, nil)
+	ldb.ldb, err = leveldb.OpenFile(config.Conf.LevelDb.DataPath, nil)
 	if err != nil {
 		panic(err.Error())
 	}

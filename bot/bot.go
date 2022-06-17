@@ -61,11 +61,11 @@ var (
 
 func init() {
 	zero.Run(zero.Config{
-		NickName:      config.Conf.NickName,
+		NickName:      config.Conf.Bot.NickName,
 		CommandPrefix: "/",
-		SuperUsers:    config.Conf.SuperUsers,
+		SuperUsers:    config.Conf.Bot.SuperUsers,
 		Driver: []zero.Driver{
-			driver.NewWebSocketClient(fmt.Sprintf("ws://%s:%s", config.Conf.CqhttpHost, config.Conf.CqhttpPort), config.Conf.AccessToken),
+			driver.NewWebSocketClient(fmt.Sprintf("ws://%s:%s", config.Conf.Bot.CqhttpHost, config.Conf.Bot.CqhttpPort), config.Conf.Bot.AccessToken),
 		},
 	})
 
@@ -82,7 +82,7 @@ func init() {
 	engine.OnMessage(rankRule).SetBlock(true).SetPriority(10).
 		Handle(func(ctx *zero.Ctx) {
 			now := time.Now()
-			ed, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.EndTime, time.Local)
+			ed, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.Event.EndTime, time.Local)
 			eds := ed.Format("20060102")
 			if err != nil {
 				xclog.Warn(err.Error())
@@ -102,7 +102,7 @@ func init() {
 			if err != nil || len(result) != 3 {
 				xclog.Warn(err)
 				dir, _ := os.Getwd()
-				ctx.Send("数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=" + config.Conf.AdminUser + "]")
+				ctx.Send("数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=" + config.Conf.Bot.AdminUser + "]")
 				return
 			}
 			// msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: %s\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s\n========================\n回复 dq/当期档线/本期档线 可查看每日档线数据", config.Conf.AppName, config.Conf.EventName, GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
@@ -201,7 +201,7 @@ func GetETA() string {
 		xclog.Warn("NTP error, now using local time.")
 		now = time.Now().Local()
 	}
-	end, _ := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.EndTime, time.Local)
+	end, _ := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.Event.EndTime, time.Local)
 	if now.After(end) {
 		return "已结束"
 	}

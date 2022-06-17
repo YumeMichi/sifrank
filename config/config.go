@@ -5,7 +5,7 @@
 //
 package config
 
-var Conf = &YamlConfigs{}
+var Conf = &AppConfigs{}
 
 func init() {
 	Conf = Load("./config.yml")

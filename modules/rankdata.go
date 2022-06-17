@@ -17,7 +17,7 @@ func RankDataTicker() {
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
-	d, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.EndTime, time.Local)
+	d, err := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.Event.EndTime, time.Local)
 	if err != nil {
 		panic(err)
 	}
@@ -27,7 +27,7 @@ func RankDataTicker() {
 		select {
 		case t := <-ticker.C:
 			// 是否活动已结束
-			et, _ := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.EndTime, time.Local)
+			et, _ := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.Event.EndTime, time.Local)
 			if t.Unix() > et.Unix() {
 				continue
 			}
