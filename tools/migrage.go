@@ -8,14 +8,22 @@ package tools
 import (
 	"fmt"
 	"sifrank/db"
-	"sifrank/model"
 	"sifrank/xclog"
 	"strconv"
 	"strings"
 )
 
+type DayRankData struct {
+	Id       int    `db:"id"`
+	Rank     string `db:"rank"`
+	RankCode string `db:"rank_code"`
+	Score    int    `db:"score"`
+	DataDate string `db:"data_date"`
+	DataTime string `db:"data_time"`
+}
+
 func MigrateFromMySQLToLevelDB() {
-	var data []model.DayRankData
+	var data []DayRankData
 	err := db.MysqlClient.Select(&data, "SELECT * FROM day_rank_data")
 	if err != nil {
 		xclog.Warn(err.Error())

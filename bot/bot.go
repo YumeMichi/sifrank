@@ -17,7 +17,6 @@ import (
 	"path/filepath"
 	"sifrank/cmd"
 	"sifrank/config"
-	"sifrank/consts"
 	"sifrank/db"
 	"sifrank/tools"
 	"sifrank/xclog"
@@ -57,6 +56,7 @@ type ItemData struct {
 
 var (
 	limiter = rate.NewManager[int64](time.Second*5, 1)
+	ranks   = []string{"ranking_1", "ranking_2", "ranking_3"}
 )
 
 func init() {
@@ -139,7 +139,7 @@ func init() {
 
 func GetData() (map[string]string, error) {
 	ret := make(map[string]string)
-	for _, v := range consts.RankType {
+	for _, v := range ranks {
 		data_prefix := "request_data_"
 		data_key := []byte(data_prefix + v)
 		requestData, err := db.LevelDb.Get(data_key)
