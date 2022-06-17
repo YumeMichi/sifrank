@@ -25,8 +25,7 @@ func RankDataTicker() {
 
 	for t := range ticker.C {
 		// 是否活动已结束
-		et, _ := time.ParseInLocation("2006-01-02 15:04:05", config.Conf.Event.EndTime, time.Local)
-		if t.Unix() > et.Unix() {
+		if t.Unix() > d.Unix() {
 			continue
 		}
 		// 是否活动结束当天
