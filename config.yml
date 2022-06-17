@@ -27,9 +27,9 @@ mysql_password: ""
 mysql_db: "sifrank"
 leveldb_path: "/data/leveldb/sifrank.db"
 app_name: LoveLive! 国服档线小助手
-event_name: "心系泰迪熊"
-start_time: "2022-05-31 15:00:00"
-end_time: "2022-06-10 14:00:00"
+event_name: "你好! 我们是μ’s!"
+start_time: "2022-06-16 15:00:00"
+end_time: "2022-06-27 14:00:00"
 dq_x_offset: 62
 dq_x_step: 160
 dq_x_extra: 14
