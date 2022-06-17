@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 //
-package sched
+package modules
 
 import (
 	"bytes"
@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func FetchNtpData() {
+func SyncNtpDate() {
 	ticker := time.NewTicker(time.Hour * 6)
 	defer ticker.Stop()
 

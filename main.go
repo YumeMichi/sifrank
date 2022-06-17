@@ -8,7 +8,7 @@ package main
 import (
 	"sifrank/config"
 	"sifrank/db"
-	"sifrank/sched"
+	"sifrank/modules"
 	"sifrank/xclog"
 )
 
@@ -22,9 +22,9 @@ func init() {
 }
 
 func main() {
-	go sched.FetchNtpData()
-	go sched.FetchPacketData()
-	go sched.FetchRankData()
+	go modules.SyncNtpDate()
+	go modules.FetchPacketData()
+	go modules.RankDataTicker()
 
 	select {}
 }

@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 //
-package sched
+package modules
 
 import (
 	"sifrank/bot"
@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func FetchRankData() {
+func RankDataTicker() {
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
