@@ -15,10 +15,8 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"sifrank/cmd"
 	"sifrank/config"
 	"sifrank/db"
-	"sifrank/tools"
 	"sifrank/xclog"
 	"strconv"
 	"strings"
@@ -93,7 +91,6 @@ func init() {
 				r1 := list[eds+"_ranking_1"]
 				r2 := list[eds+"_ranking_2"]
 				r3 := list[eds+"_ranking_3"]
-				// msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: 已结束\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s\n========================\n回复 dq/当期档线/本期档线 可查看每日档线数据", config.Conf.AppName, config.Conf.EventName, r1, r2, r3)
 				msg := fmt.Sprintf("一档点数: %s\n二档点数: %s\n三档点数: %s\n剩余时间: 已结束", r1, r2, r3)
 				ctx.Send(message.Text(msg))
 				return
@@ -105,27 +102,8 @@ func init() {
 				ctx.Send("数据获取失败，请联系维护人员~\n[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, "assets/images/emoji/fuck.jpg")) + "][CQ:at,qq=" + config.Conf.Bot.AdminUser + "]")
 				return
 			}
-			// msg := fmt.Sprintf("【%s】\n当前活动: %s\n剩余时间: %s\n一档线点数: %s\n二档线点数: %s\n三档线点数: %s\n========================\n回复 dq/当期档线/本期档线 可查看每日档线数据", config.Conf.AppName, config.Conf.EventName, GetETA(), result["ranking_1"], result["ranking_2"], result["ranking_3"])
 			msg := fmt.Sprintf("一档点数: %s\n二档点数: %s\n三档点数: %s\n剩余时间: %s", result["ranking_1"], result["ranking_2"], result["ranking_3"], GetETA())
 			ctx.Send(message.Text(msg))
-		})
-
-	dayRankRule := zero.PrefixRule("当期1", "当期档线1", "本期档线1", "dq1")
-	engine.OnMessage(dayRankRule).SetBlock(true).SetPriority(1).
-		Handle(func(ctx *zero.Ctx) {
-			savePath, err := cmd.GenDayRankPic()
-			if err != nil {
-				xclog.Warn(err.Error())
-				return
-			}
-
-			dir, _ := os.Getwd()
-			ctx.Send("[CQ:image,file=file:///" + filepath.ToSlash(filepath.Join(dir, savePath)) + "]")
-		})
-
-	engine.OnCommand("migrate", zero.AdminPermission).SetBlock(true).SetPriority(1).
-		Handle(func(ctx *zero.Ctx) {
-			tools.MigrateFromMySQLToLevelDB()
 		})
 
 	engine.OnCommand("list", zero.AdminPermission).SetBlock(true).SetPriority(1).

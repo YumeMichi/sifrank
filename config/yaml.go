@@ -20,11 +20,8 @@ type AppConfigs struct {
 	Log             LogConfigs     `yaml:"log"`
 	Pcap            PcapConfigs    `yaml:"pcap"`
 	Bot             BotConfigs     `yaml:"bot"`
-	Redis           RedisConfigs   `yaml:"redis"`
-	Mysql           MysqlConfigs   `yaml:"mysql"`
 	LevelDb         LevelDbConfigs `yaml:"leveldb"`
 	Event           EventConfigs   `yaml:"event"`
-	Dq              DqConfigs      `yaml:"dq"`
 	EnableMigration bool           `yaml:"enable_migration"`
 }
 
@@ -50,21 +47,6 @@ type BotConfigs struct {
 	AccessToken string   `yaml:"access_token"`
 }
 
-type RedisConfigs struct {
-	RedisHost     string `yaml:"redis_host"`
-	RedisPort     string `yaml:"redis_port"`
-	RedisPassword string `yaml:"redis_password"`
-	RedisDb       int    `yaml:"redis_db"`
-}
-
-type MysqlConfigs struct {
-	MysqlHost     string `yaml:"mysql_host"`
-	MysqlPort     string `yaml:"mysql_port"`
-	MysqlUser     string `yaml:"mysql_user"`
-	MysqlPassword string `yaml:"mysql_password"`
-	MysqlDb       string `yaml:"mysql_db"`
-}
-
 type LevelDbConfigs struct {
 	DataPath string `yaml:"data_path"`
 }
@@ -73,24 +55,6 @@ type EventConfigs struct {
 	EventName string `yaml:"event_name"`
 	StartTime string `yaml:"start_time"`
 	EndTime   string `yaml:"end_time"`
-}
-
-type DqConfigs struct {
-	DqXOffset         int     `yaml:"dq_x_offset"`
-	DqXStep           int     `yaml:"dq_x_step"`
-	DqXExtra          int     `yaml:"dq_x_extra"`
-	DqYOffset         int     `yaml:"dq_y_offset"`
-	DqYStep           int     `yaml:"dq_y_step"`
-	DqTitle           string  `yaml:"dq_title"`
-	DqSubtitle        string  `yaml:"dq_subtitle"`
-	DqFontName        string  `yaml:"dq_font_name"`
-	DqFontSize        float64 `yaml:"dq_font_size"`
-	DqTitleXOffset    float64 `yaml:"dq_title_x_offset"`
-	DqTitleYOffset    float64 `yaml:"dq_title_y_offset"`
-	DqSubtitleXOffset float64 `yaml:"dq_subtitle_x_offset"`
-	DqSubtitleYOffset float64 `yaml:"dq_subtitle_y_offset"`
-	DqBaseImage       string  `yaml:"dq_base_image"`
-	DqOutputDir       string  `yaml:"dq_output_dir"`
 }
 
 func DefaultConfigs() *AppConfigs {
@@ -115,19 +79,6 @@ func DefaultConfigs() *AppConfigs {
 			CqhttpPort:  "6700",
 			AccessToken: "",
 		},
-		Redis: RedisConfigs{
-			RedisHost:     "127.0.0.1",
-			RedisPort:     "6379",
-			RedisPassword: "",
-			RedisDb:       0,
-		},
-		Mysql: MysqlConfigs{
-			MysqlHost:     "127.0.0.1",
-			MysqlPort:     "3306",
-			MysqlUser:     "root",
-			MysqlPassword: "",
-			MysqlDb:       "sifrank",
-		},
 		LevelDb: LevelDbConfigs{
 			DataPath: "./sifrank.db",
 		},
@@ -135,23 +86,6 @@ func DefaultConfigs() *AppConfigs {
 			EventName: "",
 			StartTime: "",
 			EndTime:   "",
-		},
-		Dq: DqConfigs{
-			DqXOffset:         62,
-			DqXStep:           160,
-			DqXExtra:          14,
-			DqYOffset:         178,
-			DqYStep:           46,
-			DqTitle:           "活动标题",
-			DqSubtitle:        "活动子标题",
-			DqFontName:        "./simsun.ttc",
-			DqFontSize:        32,
-			DqTitleXOffset:    400,
-			DqTitleYOffset:    60,
-			DqSubtitleXOffset: 1800,
-			DqSubtitleYOffset: 60,
-			DqBaseImage:       "./base.jpg",
-			DqOutputDir:       "./temp",
 		},
 		EnableMigration: false,
 	}

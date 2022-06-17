@@ -7,23 +7,17 @@ package main
 
 import (
 	"sifrank/config"
-	"sifrank/db"
 	"sifrank/modules"
 	"sifrank/xclog"
 )
 
 func init() {
-	if config.Conf.EnableMigration {
-		db.InitMySQL()
-		db.InitRedis()
-	}
-
 	xclog.Init(config.Conf.Log.LogDir, "", config.Conf.Log.LogLevel, config.Conf.Log.LogSave)
 }
 
 func main() {
 	go modules.SyncNtpDate()
-	go modules.FetchPacketData()
+	go modules.CapPackets()
 	go modules.RankDataTicker()
 
 	select {}

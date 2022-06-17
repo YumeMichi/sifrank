@@ -18,37 +18,9 @@ bot:
     cqhttp_host: 127.0.0.1
     cqhttp_port: 6700
     access_token: klab
-redis:
-    redis_host: 127.0.0.1
-    redis_port: 6379
-    redis_password: ""
-    redis_db: 0
-mysql:
-    mysql_host: 127.0.0.1
-    mysql_port: 3306
-    mysql_user: root
-    mysql_password: ""
-    mysql_db: sifrank
 leveldb:
     data_path: /data/leveldb/sifrank.db
 event:
     event_name: 你好! 我们是μ’s!
     start_time: "2022-06-16 15:00:00"
     end_time: "2022-06-27 14:00:00"
-dq:
-    dq_x_offset: 62
-    dq_x_step: 160
-    dq_x_extra: 14
-    dq_y_offset: 178
-    dq_y_step: 46
-    dq_title: 活动标题
-    dq_subtitle: 活动子标题
-    dq_font_name: ./assets/fonts/simsun.ttc
-    dq_font_size: 32
-    dq_title_x_offset: 400
-    dq_title_y_offset: 60
-    dq_subtitle_x_offset: 1800
-    dq_subtitle_y_offset: 60
-    dq_base_image: ./assets/images/base.jpg
-    dq_output_dir: ./temp
-enable_migration: false

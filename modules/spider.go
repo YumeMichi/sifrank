@@ -105,7 +105,7 @@ func (h *httpStream) run() {
 	}
 }
 
-func FetchPacketData() {
+func CapPackets() {
 	defer util.Run()()
 	var handle *pcap.Handle
 	var err error
