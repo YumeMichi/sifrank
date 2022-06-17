@@ -42,7 +42,6 @@ func RankDataTicker() {
 		if h == hOffset && m == mOffset && s == sOffset {
 			result, err := bot.GetData()
 			if err != nil || len(result) != 3 {
-				xclog.Warn(err)
 				return
 			}
 			for k, v := range result {
