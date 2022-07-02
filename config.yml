@@ -21,6 +21,6 @@ bot:
 leveldb:
     data_path: /data/leveldb/sifrank.db
 event:
-    event_name: 你好! 我们是μ’s!
-    start_time: "2022-06-16 15:00:00"
-    end_time: "2022-06-27 14:00:00"
+    event_name: 红叶之秋 Aqours之秋
+    start_time: "2022-07-01 15:00:00"
+    end_time: "2022-07-11 14:00:00"
