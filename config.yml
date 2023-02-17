@@ -21,6 +21,5 @@ bot:
 leveldb:
     data_path: /data/leveldb/sifrank.db
 event:
-    event_name: 进阶·滑冰
-    start_time: "2022-07-15 15:00:00"
-    end_time: "2022-07-25 14:00:00"
+    start_time: "2023-02-03 15:00:00"
+    end_time: "2023-02-13 14:00:00"

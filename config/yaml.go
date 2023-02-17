@@ -52,7 +52,6 @@ type LevelDbConfigs struct {
 }
 
 type EventConfigs struct {
-	EventName string `yaml:"event_name"`
 	StartTime string `yaml:"start_time"`
 	EndTime   string `yaml:"end_time"`
 }
@@ -83,7 +82,6 @@ func DefaultConfigs() *AppConfigs {
 			DataPath: "./sifrank.db",
 		},
 		Event: EventConfigs{
-			EventName: "",
 			StartTime: "",
 			EndTime:   "",
 		},
